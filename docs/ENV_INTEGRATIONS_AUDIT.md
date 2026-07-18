@@ -2,7 +2,7 @@
 
 ## Resumo
 
-- Data e hora da auditoria: 18/07/2026, 14:26 (America/Sao_Paulo).
+- Data e hora da auditoria: 18/07/2026, 15:00 (America/Sao_Paulo).
 - Arquivos analisados: `.env.local` (não encontrado) e `.env.production` (não encontrado).
 - Quantidade total de variáveis encontradas nos arquivos auditados: 0.
 - Quantidade total de ferramentas identificadas: 8.
@@ -27,7 +27,7 @@ O projeto possui `.env.example`, mas esse arquivo é apenas um modelo. Existe ta
 | Facebook | `NEXT_PUBLIC_FACEBOOK_URL` | Local e produção | Sim | `src/config/contact.ts` | Não realizado | Referenciada, mas não configurada. |
 | Tagflow | `NEXT_PUBLIC_TAGFLOW_ENABLED`, `NEXT_PUBLIC_TAGFLOW_ENDPOINT`, `NEXT_PUBLIC_TAGFLOW_SITE_ID`, `NEXT_PUBLIC_TAGFLOW_DEBUG` | Local e produção | Sim | `src/config/tagflow.ts`, `src/lib/tagflow.ts` | Não realizado: endpoint real não fornecido | Referenciada, mas não configurada. |
 | Cloudflare Turnstile | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Local e produção | Apenas em configuração planejada | `src/components/forms/lead-form.tsx` | Não realizado: integração ainda não implementada | Teste não seguro ou não disponível. |
-| Cloudflare Pages | `CLOUDFLARE_TOKEN` | Operacional, fora do bundle | Não referenciada pelo frontend | Deploy via Wrangler | Deploy e GET público realizados; HTTP 200 | Conectividade validada. |
+| GitHub Pages | `GITHUB_TOKEN`, `NEXT_PUBLIC_BASE_PATH` | Operacional, fora do bundle | Sim, workflow e configuração | `.github/workflows/deploy-pages.yml`, `next.config.ts` | Workflow e GET público realizados; HTTP 200 | Conectividade validada. |
 
 ## Inventário de variáveis
 
@@ -60,7 +60,7 @@ Não foi possível comparar presença ou nomenclatura: os dois arquivos estão a
 
 Nenhum teste externo do Tagflow foi executado. O endpoint presente em `.env.example` é um placeholder e não pode ser consultado. A integração não deve ser considerada funcional até que um endpoint real seja configurado e os eventos sejam confirmados no Tagflow e nos destinos encaminhados pelo Worker.
 
-Cloudflare Pages foi validado separadamente: o projeto `cifra` recebeu o build estático e a URL pública respondeu HTTP 200. O domínio oficial foi associado, mas permanece pendente por ausência de resolução DNS acessível à conta/token utilizado.
+GitHub Pages foi validado separadamente: o workflow publicou o build estático em `avilaops.github.io/cifra/`; a página inicial, a página de obrigado, os arquivos de SEO e um asset JavaScript responderam HTTP 200. O projeto temporário criado no Cloudflare Pages foi removido após a migração.
 
 ## Recomendações
 
@@ -73,6 +73,7 @@ Cloudflare Pages foi validado separadamente: o projeto `cifra` recebeu o build e
 
 ## Histórico de auditorias
 
+- 18/07/2026 15:00 - Deploy migrado e validado no GitHub Pages; projeto temporário do Cloudflare Pages removido.
 - 18/07/2026 14:26 - Deploy no Cloudflare Pages validado por GET; domínio oficial associado, ainda pendente de DNS/TLS.
 - 18/07/2026 13:52 - Analytics direto removido; Tagflow registrado como camada central. Dez variáveis ausentes e nenhuma conectividade externa validada.
 - 18/07/2026 13:35 - Auditoria inicial: `.env.local` e `.env.production` não encontrados; nove variáveis/integrações mapeadas.

@@ -6,7 +6,7 @@ O frontend está preparado para emitir eventos anonimizados ao endpoint público
 
 Validação local em 18/07/2026: `npm run typecheck` e `npm run build` concluídos com sucesso; 20 páginas estáticas foram geradas.
 
-Deploy Cloudflare Pages: concluído no projeto `cifra`; home, `/obrigado/`, `/robots.txt` e `/sitemap.xml` responderam HTTP 200. O domínio `cifrainssdeobra.com.br` foi associado e permanece pendente de DNS/TLS.
+Deploy GitHub Pages: concluído pelo workflow do repositório `avilaops/cifra`; home, `/obrigado/`, `/robots.txt`, `/sitemap.xml` e os assets sob `/cifra/_next/` responderam HTTP 200. O projeto temporário do Cloudflare Pages foi removido após a migração.
 
 | Evento | Frontend | Tagflow | GA4 | Meta Pixel | Meta CAPI | Google Ads |
 |---|---|---|---|---|---|---|
