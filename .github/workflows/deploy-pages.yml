@@ -35,7 +35,6 @@ jobs:
 
       - name: Build
         env:
-          NEXT_PUBLIC_BASE_PATH: /cifra
           NEXT_PUBLIC_WHATSAPP_NUMBER: ${{ secrets.NEXT_PUBLIC_WHATSAPP_NUMBER }}
           NEXT_PUBLIC_TAGFLOW_ENABLED: "false"
         run: npm run build
