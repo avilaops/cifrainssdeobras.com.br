@@ -3,7 +3,7 @@ export const TAGFLOW_CONFIG = {
   endpoint: process.env.NEXT_PUBLIC_TAGFLOW_ENDPOINT ?? "",
   siteId: process.env.NEXT_PUBLIC_TAGFLOW_SITE_ID ?? "cifra",
   debug: process.env.NEXT_PUBLIC_TAGFLOW_DEBUG === "true",
-  siteDomain: "cifrainssdeobra.com.br",
+  siteDomain: "cifrainssdeobras.com.br",
   brand: "CIFRA",
   businessType: "consultoria_tributaria_de_obra",
 } as const;

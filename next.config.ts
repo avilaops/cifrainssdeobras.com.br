@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 /**
  * Deploy: GitHub Pages (static export).
  *
- * Com domínio próprio (cifrainssdeobra.com.br) o site é servido na raiz e
+ * Com domínio próprio (cifrainssdeobras.com.br) o site é servido na raiz e
  * NENHUM basePath é necessário. Se precisar publicar temporariamente em
  * https://avilaops.github.io/cifra (sem domínio próprio), defina a variável
  * NEXT_PUBLIC_BASE_PATH=/cifra no build.

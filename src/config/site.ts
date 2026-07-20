@@ -8,8 +8,8 @@ export const siteConfig = {
   legalName: "CIFRA — Consultoria Tributária de Obra",
   shortDescription:
     "Consultoria especializada em INSS de obra, CNO, SERO, aferição e regularização tributária de obras em todo o Brasil.",
-  url: "https://cifrainssdeobra.com.br",
-  domain: "cifrainssdeobra.com.br",
+  url: "https://cifrainssdeobras.com.br",
+  domain: "cifrainssdeobras.com.br",
 
   seo: {
     title: "CIFRA | Consultoria de INSS de Obra e Regularização",
