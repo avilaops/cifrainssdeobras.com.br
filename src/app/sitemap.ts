@@ -14,6 +14,7 @@ const routes = [
   "/servicos/planejamento-tributario/",
   "/parceiros/",
   "/contato/",
+  "/procuracao-eletronica/",
   "/politica-de-privacidade/",
   "/termos-de-uso/",
 ];
