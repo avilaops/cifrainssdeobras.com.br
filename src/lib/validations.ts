@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  OPCOES_SIM_NAO_NAOSEI,
   ORIGENS,
   SITUACOES_OBRA,
   TIPOS_CLIENTE,
@@ -65,23 +64,23 @@ export const leadFormSchema = z.object({
   area: z
     .string()
     .trim()
-    .min(1, "Informe a área aproximada em m².")
+    .min(1, "Informe a área do projeto em m².")
     .refine(numeroPositivo, "Informe um número válido, ex.: 250"),
-
-  possuiCno: z.enum(OPCOES_SIM_NAO_NAOSEI, {
-    errorMap: () => ({ message: selecioneUmaOpcao }),
-  }),
-
-  afericaoSero: z.enum(OPCOES_SIM_NAO_NAOSEI, {
-    errorMap: () => ({ message: selecioneUmaOpcao }),
-  }),
 
   origem: z.enum(ORIGENS, {
     errorMap: () => ({ message: selecioneUmaOpcao }),
   }),
 
-  dataInicio: z.string().trim().max(20, "Data muito longa.").optional(),
-  dataConclusao: z.string().trim().max(20, "Data muito longa.").optional(),
+  dataInicio: z
+    .string()
+    .trim()
+    .min(1, "Informe o mês/ano de início da obra.")
+    .max(20, "Data muito longa."),
+  dataConclusao: z
+    .string()
+    .trim()
+    .min(1, "Informe o mês/ano previsto de conclusão da obra.")
+    .max(20, "Data muito longa."),
 
   valorInss: z
     .string()

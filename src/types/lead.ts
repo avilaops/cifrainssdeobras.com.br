@@ -34,9 +34,6 @@ export const TIPOS_OBRA = [
 ] as const;
 export type TipoObra = (typeof TIPOS_OBRA)[number];
 
-export const OPCOES_SIM_NAO_NAOSEI = ["Sim", "Não", "Não sei"] as const;
-export type SimNaoNaoSei = (typeof OPCOES_SIM_NAO_NAOSEI)[number];
-
 export const ORIGENS = [
   "Google",
   "Instagram",
@@ -65,11 +62,9 @@ export interface Lead {
   situacaoObra: SituacaoObra;
   tipoObra: TipoObra;
   area: string;
-  possuiCno: SimNaoNaoSei;
-  afericaoSero: SimNaoNaoSei;
   origem: Origem;
-  dataInicio?: string;
-  dataConclusao?: string;
+  dataInicio: string;
+  dataConclusao: string;
   valorInss?: string;
   observacoes?: string;
 }

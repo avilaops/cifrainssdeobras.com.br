@@ -8,7 +8,6 @@ import { ArrowRight, CircleCheckBig, Loader2, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import {
   LEAD_PREFILL_STORAGE_KEY,
-  OPCOES_SIM_NAO_NAOSEI,
   ORIGENS,
   SITUACOES_OBRA,
   TIPOS_CLIENTE,
@@ -43,8 +42,6 @@ const defaultValues: LeadFormValues = {
   situacaoObra: "" as LeadFormValues["situacaoObra"],
   tipoObra: "" as LeadFormValues["tipoObra"],
   area: "",
-  possuiCno: "" as LeadFormValues["possuiCno"],
-  afericaoSero: "" as LeadFormValues["afericaoSero"],
   origem: "" as LeadFormValues["origem"],
   dataInicio: "",
   dataConclusao: "",
@@ -159,8 +156,6 @@ export function LeadForm() {
       clientType: data.tipoCliente,
       workStatus: data.situacaoObra,
       workType: data.tipoObra,
-      hasCno: data.possuiCno,
-      hasSero: data.afericaoSero,
       source: "lead_form",
       placement: "form",
     };
@@ -365,8 +360,8 @@ export function LeadForm() {
           </div>
 
           {/* Área */}
-          <div>
-            <Label htmlFor="area">Área aproximada (m²) *</Label>
+          <div className="sm:col-span-2">
+            <Label htmlFor="area">Área do projeto (m²) *</Label>
             <Input
               id="area"
               inputMode="decimal"
@@ -375,57 +370,11 @@ export function LeadForm() {
               aria-describedby={describedBy("area")}
               {...register("area")}
             />
+            <p className="mt-1.5 text-xs text-graphite-400">
+              Conforme consta no alvará ou no projeto. Se a obra ainda não
+              começou, informe a área prevista em Observações.
+            </p>
             <FieldError id="area-error" message={errors.area?.message} />
-          </div>
-
-          {/* CNO */}
-          <div>
-            <Label htmlFor="possuiCno">Possui CNO? *</Label>
-            <Select
-              id="possuiCno"
-              aria-invalid={invalid("possuiCno")}
-              aria-describedby={describedBy("possuiCno")}
-              defaultValue=""
-              {...register("possuiCno")}
-            >
-              <option value="" disabled>
-                Selecione
-              </option>
-              {OPCOES_SIM_NAO_NAOSEI.map((opcao) => (
-                <option key={opcao} value={opcao}>
-                  {opcao}
-                </option>
-              ))}
-            </Select>
-            <FieldError
-              id="possuiCno-error"
-              message={errors.possuiCno?.message}
-            />
-          </div>
-
-          {/* SERO */}
-          <div>
-            <Label htmlFor="afericaoSero">Já realizou aferição no SERO? *</Label>
-            <Select
-              id="afericaoSero"
-              aria-invalid={invalid("afericaoSero")}
-              aria-describedby={describedBy("afericaoSero")}
-              defaultValue=""
-              {...register("afericaoSero")}
-            >
-              <option value="" disabled>
-                Selecione
-              </option>
-              {OPCOES_SIM_NAO_NAOSEI.map((opcao) => (
-                <option key={opcao} value={opcao}>
-                  {opcao}
-                </option>
-              ))}
-            </Select>
-            <FieldError
-              id="afericaoSero-error"
-              message={errors.afericaoSero?.message}
-            />
           </div>
 
           {/* Origem */}
@@ -452,7 +401,7 @@ export function LeadForm() {
 
           {/* Datas */}
           <div>
-            <Label htmlFor="dataInicio">Início da obra (opcional)</Label>
+            <Label htmlFor="dataInicio">Início da obra *</Label>
             <Input
               id="dataInicio"
               placeholder="Ex.: 03/2023"
@@ -466,7 +415,7 @@ export function LeadForm() {
             />
           </div>
           <div>
-            <Label htmlFor="dataConclusao">Conclusão da obra (opcional)</Label>
+            <Label htmlFor="dataConclusao">Conclusão prevista da obra *</Label>
             <Input
               id="dataConclusao"
               placeholder="Ex.: 12/2024"
