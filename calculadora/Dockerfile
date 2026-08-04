@@ -1,7 +1,7 @@
 FROM node:22-alpine AS base
 
-# Install openssl for Prisma
-RUN apk add --no-cache openssl
+# Install openssl for Prisma and Chromium for Puppeteer
+RUN apk add --no-cache openssl chromium nss nss-tools freetype harfbuzz ca-certificates ttf-freefont
 
 FROM base AS builder
 WORKDIR /app
