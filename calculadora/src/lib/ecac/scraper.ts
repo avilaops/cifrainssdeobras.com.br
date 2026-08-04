@@ -1,4 +1,8 @@
-import puppeteer, { Browser, Page } from 'puppeteer-core';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { Browser, Page } from 'puppeteer-core';
+
+puppeteer.use(StealthPlugin());
 import { CertificateContext } from './cert-manager';
 
 export async function createECACSession(certContext: CertificateContext) {
