@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Simulador INSS de Obra — CIFRA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#161c12;--navy2:#1f2919;--navy3:#293622;--blue:#7c8a68;--blue-dk:#5c6a4a;--blue-lt:#e6ebdd;--gold:#c99a2e;--green:#566b47;--green-lt:#dcf4e8;--red:#b91c1c;--red-lt:#fee2e2;--grey1:#f4f6f9;--grey2:#e8ecf1;--grey3:#cdd4df;--grey5:#8592a6;--grey7:#4a5568;--white:#fff;--r:8px;--rs:4px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',Arial,sans-serif;background:var(--navy);color:var(--white);min-height:100vh;font-size:14px;line-height:1.5}
+.app{display:flex;flex-direction:column;min-height:100vh}
+.topnav{background:var(--navy2);border-bottom:1px solid rgba(255,255,255,.07);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.logo-pill{background:var(--white);color:var(--navy);padding:5px 10px;border-radius:4px;font-weight:900;font-size:13px;letter-spacing:1.5px;line-height:1}
+.logo-pill small{display:block;font-size:7px;letter-spacing:3px;font-weight:400;color:var(--grey7);text-transform:uppercase;margin-top:2px}
+.topnav-title{font-size:13px;color:var(--grey5);font-weight:500;margin-left:12px}
+.topnav-left{display:flex;align-items:center}
+.topnav-tabs{display:flex;gap:2px}
+.tab-btn{background:transparent;border:none;color:var(--grey5);padding:8px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:.15s;letter-spacing:.3px}
+.tab-btn:hover{background:rgba(255,255,255,.06);color:var(--white)}
+.tab-btn.active{background:var(--blue);color:var(--white)}
+.main{flex:1;display:grid;grid-template-columns:370px 1fr;gap:0;overflow:hidden;height:calc(100vh - 60px)}
+.sidebar{background:var(--navy2);border-right:1px solid rgba(255,255,255,.07);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--grey5);display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07)}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:600;color:var(--grey5);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select{background:var(--navy3);border:1px solid rgba(255,255,255,.1);color:var(--white);border-radius:var(--rs);padding:9px 12px;font-family:inherit;font-size:13px;outline:none;transition:.15s;-webkit-appearance:none}
+.field input:focus,.field select:focus{border-color:var(--blue);background:rgba(26,86,219,.08)}
+.field input[type=number]{text-align:right}
+.field select option{background:var(--navy2)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.radio-group{display:flex;gap:6px}
+.rdo{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.1);border-radius:var(--rs);padding:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--grey5);transition:.15s;user-select:none}
+.rdo input{display:none}
+.rdo:has(input:checked){background:rgba(26,86,219,.2);border-color:var(--blue);color:var(--white)}
+.rdo .dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--grey5);transition:.15s;flex-shrink:0}
+.rdo:has(input:checked) .dot{background:var(--blue);border-color:var(--blue)}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.tog-label{font-size:12px;color:var(--grey3)}
+.tog{position:relative;display:inline-block;width:38px;height:22px}
+.tog input{opacity:0;width:0;height:0}
+.sld{position:absolute;inset:0;background:var(--navy3);border:1px solid rgba(255,255,255,.15);border-radius:22px;cursor:pointer;transition:.2s}
+.sld::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:var(--grey5);border-radius:50%;transition:.2s}
+input:checked+.sld{background:var(--blue);border-color:var(--blue)}
+input:checked+.sld::before{transform:translateX(16px);background:var(--white)}
+.vau-box{background:rgba(201,154,46,.08);border:1px solid rgba(201,154,46,.25);border-radius:var(--rs);padding:10px 12px;margin-top:4px}
+.vau-box-lbl{font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.sld-row{display:flex;align-items:center;gap:10px}
+.sld-row input[type=range]{flex:1;accent-color:var(--blue);height:4px}
+.sld-val{font-size:13px;font-weight:700;color:var(--blue);min-width:36px;text-align:right}
+.btn{background:linear-gradient(135deg,var(--blue),var(--blue-dk));color:var(--white);border:none;border-radius:var(--r);padding:12px 20px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:.2s;width:100%;box-shadow:0 4px 16px rgba(26,86,219,.4)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,86,219,.5)}
+.btn.green{background:linear-gradient(135deg,var(--green),#1f5c39);box-shadow:0 4px 16px rgba(46,125,81,.35)}
+.btn.green:hover{box-shadow:0 6px 20px rgba(46,125,81,.5)}
+.content{overflow-y:auto;padding:24px}
+.content::-webkit-scrollbar{width:4px}.content::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;text-align:center;gap:12px;color:var(--grey5)}
+.empty .ico{font-size:52px;opacity:.35}
+.empty h3{font-size:16px;font-weight:600;color:var(--grey3)}
+.empty p{font-size:13px;max-width:280px}
+.res-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.res-hdr h2{font-size:16px;font-weight:700}
+.vau-badge{background:rgba(201,154,46,.15);border:1px solid rgba(201,154,46,.3);color:var(--gold);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:var(--navy2);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.red::before{background:linear-gradient(90deg,var(--red),#dc2626)}
+.kpi.blue::before{background:linear-gradient(90deg,var(--blue),#3b82f6)}
+.kpi.green::before{background:linear-gradient(90deg,var(--green),#22c55e)}
+.kpi-lbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--grey5);margin-bottom:6px}
+.kpi-val{font-size:20px;font-weight:800;line-height:1}
+.kpi-sub{font-size:10px;color:var(--grey5);margin-top:4px}
+.card{background:var(--navy2);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:18px;margin-bottom:16px}
+.card-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--grey5);margin-bottom:14px}
+.comp-row{margin-bottom:12px}
+.comp-hdr{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px}
+.comp-lbl{color:var(--grey5)}.comp-val{font-weight:700}
+.bar-track{height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.bar-red{background:linear-gradient(90deg,var(--red),#dc2626)}
+.bar-blue{background:linear-gradient(90deg,var(--blue),#3b82f6)}
+.bar-green{background:linear-gradient(90deg,var(--green),#22c55e)}
+.steps-tbl{width:100%;border-collapse:collapse}
+.steps-tbl tr{border-bottom:1px solid rgba(255,255,255,.05)}
+.steps-tbl tr:last-child{border-bottom:none}
+.steps-tbl td{padding:7px 0;font-size:12px;vertical-align:middle}
+.steps-tbl td:first-child{color:var(--grey5);width:55%}
+.steps-tbl td:last-child{text-align:right;font-weight:700}
+.steps-tbl .hl td{color:var(--gold)}
+.parc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.parc-card{background:var(--navy2);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:16px}
+.parc-card.retro{border-top:3px solid var(--red)}
+.parc-card.fut{border-top:3px solid var(--blue)}
+.parc-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.parc-card.retro .parc-lbl{color:var(--red)}.parc-card.fut .parc-lbl{color:var(--blue)}
+.parc-val{font-size:18px;font-weight:800}
+.parc-obs{font-size:10px;color:var(--grey5);margin-top:4px;font-style:italic}
+.alert{border-radius:var(--r);padding:11px 13px;margin-bottom:14px;font-size:12px;line-height:1.6;display:flex;gap:9px;align-items:flex-start}
+.alert.info{background:rgba(26,86,219,.1);border:1px solid rgba(26,86,219,.25);color:var(--blue-lt)}
+.alert.warn{background:rgba(185,28,28,.1);border:1px solid rgba(185,28,28,.25);color:#fca5a5}
+.alert.ok{background:rgba(46,125,81,.1);border:1px solid rgba(46,125,81,.25);color:#86efac}
+.alert-ico{font-size:15px;flex-shrink:0;margin-top:1px}
+.planj-info{background:rgba(26,86,219,.1);border:1px solid rgba(26,86,219,.25);border-radius:var(--r);padding:13px;margin-bottom:16px;font-size:12px;color:var(--blue-lt);line-height:1.6}
+.tbl-wrap{background:var(--navy2);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);overflow:hidden}
+.ptbl{width:100%;border-collapse:collapse;font-size:12px}
+.ptbl th{background:rgba(255,255,255,.05);padding:10px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--grey5);border-bottom:1px solid rgba(255,255,255,.07)}
+.ptbl td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.ptbl tr:last-child td{border-bottom:none}
+.ptbl tr:hover td{background:rgba(255,255,255,.02)}
+.ptbl tr.retro td{background:rgba(185,28,28,.05)}
+.sbadge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.sbadge.retro{background:rgba(185,28,28,.2);color:#fca5a5}
+.sbadge.atual{background:rgba(46,125,81,.2);color:#4ade80}
+.sbadge.fut{background:rgba(26,86,219,.2);color:#93c5fd}
+.planj-footer{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px;border-top:1px solid rgba(255,255,255,.07)}
+.pf-item{text-align:center}
+.pf-lbl{font-size:10px;color:var(--grey5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.pf-val{font-size:14px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="topnav">
+  <div class="topnav-left">
+    <div class="logo-pill">CIFRA<small>Consultoria Tributária</small></div>
+    <span class="topnav-title">Sistema de Planejamento Tributário de Obra</span>
+  </div>
+  <div class="topnav-tabs">
+    <button class="tab-btn active" onclick="showTab('sim',this)">⚙ Simulação</button>
+    <button class="tab-btn" onclick="showTab('plan',this)">📅 Planejador DCTFWeb</button>
+  </div>
+</nav>
+<div class="main">
+<aside class="sidebar">
+  <div class="sec-title">Identificação</div>
+  <div class="field"><label>Nome do Cliente</label><input id="nomeCliente" type="text" placeholder="Ex: Fausto Augusto Matta"/></div>
+  <div class="field"><label>Responsável pela Obra</label>
+    <div class="radio-group">
+      <label class="rdo"><input type="radio" name="resp" value="pf" checked/><span class="dot"></span>Pessoa Física</label>
+      <label class="rdo"><input type="radio" name="resp" value="pj"/><span class="dot"></span>Pessoa Jurídica</label>
+    </div>
+  </div>
+  <div class="sec-title">Dados da Obra</div>
+  <div class="row2">
+    <div class="field"><label>UF da Obra</label><select id="uf"></select></div>
+    <div class="field"><label>Tipo de Obra</label><select id="tipo"></select></div>
+  </div>
+  <div class="field"><label>Área de Construção (m²)</label><input id="areaCon" type="number" placeholder="0,00" step="0.01" min="0" value="0"/></div>
+  <div class="tog-row">
+    <span class="tog-label">Tem Reforma ou Demolição?</span>
+    <label class="tog"><input type="checkbox" id="togRef" onchange="xtr('ref',this.checked)"><span class="sld"></span></label>
+  </div>
+  <div id="xRef" style="display:none">
+    <div class="row2" style="margin-top:8px">
+      <div class="field"><label>Reforma (m²)</label><input id="areaRef" type="number" placeholder="0" step="0.01" min="0" value="0"/></div>
+      <div class="field"><label>Demolição (m²)</label><input id="areaDem" type="number" placeholder="0" step="0.01" min="0" value="0"/></div>
+    </div>
+  </div>
+  <div class="tog-row">
+    <span class="tog-label">Tem Piscina?</span>
+    <label class="tog"><input type="checkbox" id="togPis" onchange="xtr('pis',this.checked)"><span class="sld"></span></label>
+  </div>
+  <div id="xPis" style="display:none;margin-top:8px">
+    <div class="field"><label>Piscina (m²)</label><input id="areaPis" type="number" placeholder="0" step="0.01" min="0" value="0"/></div>
+  </div>
+  <div class="tog-row">
+    <span class="tog-label">Usa Concreto Usinado? (−5%)</span>
+    <label class="tog"><input type="checkbox" id="conUsi"><span class="sld"></span></label>
+  </div>
+  <div class="sec-title">Período da Obra</div>
+  <div class="row2">
+    <div class="field"><label>Início</label><input id="dtIni" type="month"/></div>
+    <div class="field"><label>Encerramento</label><input id="dtFim" type="month"/></div>
+  </div>
+  <div class="sec-title">VAU Personalizado</div>
+  <div class="tog-row">
+    <span class="tog-label">Inserir VAU manualmente?</span>
+    <label class="tog"><input type="checkbox" id="togVau" onchange="xtr('vau',this.checked)"><span class="sld"></span></label>
+  </div>
+  <div id="xVau" style="display:none;margin-top:4px">
+    <div class="vau-box">
+      <div class="vau-box-lbl">⚡ VAU Atual (R$/m²)</div>
+      <div class="field"><input id="vauMan" type="number" placeholder="Ex: 2642" step="1" min="0" value="0"/></div>
+      <p style="font-size:10px;color:var(--gold);margin-top:6px;font-style:italic">Consulte em Receita Federal / SERO / e-CAC</p>
+    </div>
+  </div>
+  <div class="sec-title">Honorários do Profissional</div>
+  <div class="field"><label>% sobre a Economia Gerada</label>
+    <div class="sld-row">
+      <input type="range" id="percHon" min="10" max="70" step="5" value="30" oninput="document.getElementById('honVal').textContent=this.value+'%';recalc()"/>
+      <span class="sld-val" id="honVal">30%</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+    <button class="btn" onclick="recalc()">⚡ Calcular Simulação</button>
+    <button class="btn green" onclick="gerarProposta()">📄 Gerar Proposta PDF</button>
+  </div>
+</aside>
+<main class="content">
+  <div class="tab-panel active" id="panel-sim">
+    <div id="empty0" class="empty"><div class="ico">🏗️</div><h3>Preencha os dados ao lado</h3><p>A simulação do INSS de obra aparecerá aqui automaticamente.</p></div>
+    <div id="res" style="display:none">
+      <div class="res-hdr"><h2>Resultado da Simulação</h2><div class="vau-badge" id="vauBdg">VAU: R$ —</div></div>
+      <div class="alert info"><span class="alert-ico">ℹ️</span><span id="alertTxt"></span></div>
+      <div class="kpi-grid">
+        <div class="kpi red"><div class="kpi-lbl">INSS Devido (sem planejamento)</div><div class="kpi-val" id="kD">R$ —</div><div class="kpi-sub" id="kDsub"></div></div>
+        <div class="kpi blue"><div class="kpi-lbl">INSS com Planejamento</div><div class="kpi-val" id="kR">R$ —</div><div class="kpi-sub" id="kRsub"></div></div>
+        <div class="kpi green"><div class="kpi-lbl">Economia Líquida</div><div class="kpi-val" id="kL">R$ —</div><div class="kpi-sub" id="kLsub"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Comparativo Visual</div>
+        <div class="comp-row"><div class="comp-hdr"><span class="comp-lbl">INSS sem planejamento</span><span class="comp-val" id="bvD"></span></div><div class="bar-track"><div class="bar-fill bar-red" id="bD" style="width:100%"></div></div></div>
+        <div class="comp-row"><div class="comp-hdr"><span class="comp-lbl">INSS com planejamento</span><span class="comp-val" id="bvR"></span></div><div class="bar-track"><div class="bar-fill bar-blue" id="bR" style="width:0%"></div></div></div>
+        <div class="comp-row"><div class="comp-hdr"><span class="comp-lbl">Economia líquida</span><span class="comp-val" id="bvL"></span></div><div class="bar-track"><div class="bar-fill bar-green" id="bL" style="width:0%"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Detalhamento do Cálculo</div>
+        <table class="steps-tbl">
+          <tbody>
+            <tr><td>VAU utilizado (R$/m²)</td><td id="sVau">—</td></tr>
+            <tr><td>Área total aferida</td><td id="sArea">—</td></tr>
+            <tr><td>COD — Custo da Obra por Destinação</td><td id="sCod">—</td></tr>
+            <tr><td>RMT — Remuneração da Mão de Obra Total</td><td id="sRmt">—</td></tr>
+            <tr><td>Fator Social (Pessoa Física)</td><td id="sFS">—</td></tr>
+            <tr class="hl"><td>INSS Bruto (RMT × 36,8%)</td><td id="sIB">—</td></tr>
+            <tr><td>INSS Devido (após Fator Social)</td><td id="sID">—</td></tr>
+            <tr><td>Redução com Fator de Ajuste (art. 33)</td><td id="sFA">—</td></tr>
+            <tr class="hl"><td>INSS com Planejamento</td><td id="sIR">—</td></tr>
+            <tr><td>Economia em Imposto</td><td id="sEB">—</td></tr>
+            <tr><td>Honorários do Profissional</td><td id="sHon">—</td></tr>
+            <tr class="hl"><td>Economia Líquida</td><td id="sEL">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="parc-grid">
+        <div class="parc-card retro"><div class="parc-lbl">Período Retroativo</div><div class="parc-val" id="pRetro">—</div><div class="parc-obs">Emitido integralmente na abertura do processo</div></div>
+        <div class="parc-card fut"><div class="parc-lbl">Período Futuro</div><div class="parc-val" id="pFut">—</div><div class="parc-obs" id="pFutObs">Pago mensalmente até o habite-se</div></div>
+      </div>
+      <div class="alert warn"><span class="alert-ico">⚠️</span><span>Valores estimados com base em dados de referência. O cálculo oficial deve ser feito via <strong>SERO/e-CAC</strong>. O Fator de Ajuste exige transmissão mensal da <strong>DCTFWeb</strong> durante toda a obra.</span></div>
+    </div>
+  </div>
+  <div class="tab-panel" id="panel-plan">
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:4px">📅 Planejador Mensal DCTFWeb</h2>
+    <p style="font-size:12px;color:var(--grey5);margin-bottom:16px">Acompanhe mês a mês o que deve ser declarado para garantir o Fator de Ajuste.</p>
+    <div id="planEmpty" class="empty" style="min-height:360px"><div class="ico">📅</div><h3>Gere a simulação primeiro</h3><p>Preencha o formulário e calcule para ver o plano mensal.</p></div>
+    <div id="planCont" style="display:none">
+      <div class="planj-info" id="planInfo"></div>
+      <div class="tbl-wrap">
+        <table class="ptbl">
+          <thead><tr><th>Competência</th><th>Status</th><th>Remun. Mín. Declarar</th><th>INSS do Mês</th><th>Acumulado</th></tr></thead>
+          <tbody id="planBody"></tbody>
+        </table>
+        <div class="planj-footer" id="planFoot"></div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+</div>
+<script src="js/dados.js"></script>
+<script src="js/calculos.js"></script>
+<script>
+const UFS=['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
+function initForm(){
+  const su=document.getElementById('uf');
+  UFS.forEach(u=>{const o=document.createElement('option');o.value=u;o.textContent=u;if(u==='SP')o.selected=true;su.appendChild(o)});
+  const st=document.getElementById('tipo');
+  Object.entries(TIPOS_OBRA).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v.label;if(k==='residencial')o.selected=true;st.appendChild(o)});
+  const hoje=new Date();
+  const i=new Date(hoje.getFullYear()-1,hoje.getMonth());
+  document.getElementById('dtIni').value=`${i.getFullYear()}-${String(i.getMonth()+1).padStart(2,'0')}`;
+  const f=new Date(hoje.getFullYear()+1,hoje.getMonth());
+  document.getElementById('dtFim').value=`${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,'0')}`;
+  document.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener('change',recalc);
+    if(el.tagName==='INPUT'&&el.type==='number')el.addEventListener('input',debounce(recalc,400));
+  });
+}
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
+function showTab(n,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+  btn.classList.add('active');
+}
+function xtr(id,show){
+  const m={ref:'xRef',pis:'xPis',vau:'xVau'};
+  document.getElementById(m[id]).style.display=show?'block':'none';
+}
+let lastR=null;
+function getP(){
+  const resp=document.querySelector('input[name="resp"]:checked').value;
+  const uf=document.getElementById('uf').value;
+  const tipo=document.getElementById('tipo').value;
+  const areaConstrucao=parseFloat(document.getElementById('areaCon').value)||0;
+  const areaRef=parseFloat(document.getElementById('areaRef')?.value)||0;
+  const areaDem=parseFloat(document.getElementById('areaDem')?.value)||0;
+  const areaPiscina=parseFloat(document.getElementById('areaPis')?.value)||0;
+  const concretoUsinado=document.getElementById('conUsi').checked;
+  const dataInicio=document.getElementById('dtIni').value+'-01';
+  const dataFim=document.getElementById('dtFim').value+'-01';
+  const vauManual=document.getElementById('togVau').checked?(parseFloat(document.getElementById('vauMan').value)||0):0;
+  const percHonorarios=parseInt(document.getElementById('percHon').value)/100;
+  return{responsavel:resp,uf,tipo,areaConstrucao,areaReforma:areaRef+areaDem,areaPiscina,concretoUsinado,dataInicio,dataFim,vauManual,percHonorarios};
+}
+function recalc(){
+  const p=getP();
+  if(p.areaConstrucao===0&&p.areaReforma===0&&p.areaPiscina===0)return;
+  const r=calcularINSS(p);
+  lastR={p,r};
+  document.getElementById('empty0').style.display='none';
+  document.getElementById('res').style.display='block';
+  document.getElementById('vauBdg').textContent=`VAU: R$ ${num(r.vauUsado,0)}/m²`;
+  const pct=Math.round(r.reducaoPercent);
+  document.getElementById('alertTxt').innerHTML=r.podeAjuste
+    ?`✅ Fator de Ajuste aplicável (${r.areaTotal<=350?'50%':'70%'} mín. de DCTFWeb). Redução estimada de <strong>${pct}%</strong> sobre o INSS devido.`
+    :`⚠️ Pessoa Jurídica: Fator de Ajuste não se aplica. INSS calculado pela aferição indireta padrão.`;
+  document.getElementById('kD').textContent=brl(r.inssDevido);
+  document.getElementById('kDsub').textContent=`RMT: ${brl(r.rmtTotal)}`;
+  document.getElementById('kR').textContent=brl(r.inssComReducao);
+  document.getElementById('kRsub').textContent=`${pct}% de redução`;
+  document.getElementById('kL').textContent=brl(r.economiaLiq);
+  document.getElementById('kLsub').textContent=`após ${brl(r.honorarios)} em honorários`;
+  const mx=r.inssDevido;
+  ['D','R','L'].forEach(k=>{
+    const vals={D:r.inssDevido,R:r.inssComReducao,L:r.economiaLiq};
+    document.getElementById('bv'+k).textContent=brl(vals[k]);
+    document.getElementById('b'+k).style.width=(vals[k]/mx*100)+'%';
+  });
+  document.getElementById('sVau').textContent=`R$ ${num(r.vauUsado,0)}/m²`;
+  document.getElementById('sArea').textContent=`${num(r.areaTotal)} m²`;
+  document.getElementById('sCod').textContent=brl(r.codTotal);
+  document.getElementById('sRmt').textContent=brl(r.rmtTotal);
+  document.getElementById('sFS').textContent=r.podeAjuste?`${r.fatorSocial} (${Math.round(r.fatorSocial*100)}%)`:'N/A (PJ)';
+  document.getElementById('sIB').textContent=brl(r.inssBruto);
+  document.getElementById('sID').textContent=brl(r.inssDevido);
+  document.getElementById('sFA').textContent=r.podeAjuste?`${pct}% (Fator de Ajuste art. 33)`:'N/A';
+  document.getElementById('sIR').textContent=brl(r.inssComReducao);
+  document.getElementById('sEB').textContent=brl(r.economiaImposto);
+  document.getElementById('sHon').textContent=`${brl(r.honorarios)} (${Math.round(p.percHonorarios*100)}% da economia)`;
+  document.getElementById('sEL').textContent=brl(r.economiaLiq);
+  document.getElementById('pRetro').textContent=brl(r.retroativo);
+  document.getElementById('pFut').textContent=brl(r.futuro);
+  document.getElementById('pFutObs').textContent=r.mesesFuturos>0?`${r.mesesFuturos} parcelas de ${brl(r.parcelaMensal)}/mês`:'Obra já encerrada';
+  renderPlan(p,r);
+}
+function renderPlan(p,r){
+  document.getElementById('planEmpty').style.display='none';
+  document.getElementById('planCont').style.display='block';
+  const minP=r.areaTotal<=350?0.50:0.70;
+  const mT=Math.max(1,mesesEntreDatas(p.dataInicio,p.dataFim));
+  const rmtMes=r.rmtTotal/mT;
+  const rmtMin=rmtMes*minP;
+  const inssMes=rmtMin*ALIQUOTA_INSS;
+  document.getElementById('planInfo').innerHTML=`Para garantir o <strong>Fator de Ajuste (art. 33)</strong>, declare mensalmente no eSocial/DCTFWeb o mínimo de <strong>${Math.round(minP*100)}% da RMT mensal</strong> = <strong>${brl(rmtMin)}</strong> em remunerações → INSS mensal de ≈ <strong>${brl(inssMes)}</strong>.`;
+  const inicio=new Date(p.dataInicio);
+  const fim=new Date(p.dataFim);
+  const hoje=new Date();
+  const body=document.getElementById('planBody');
+  body.innerHTML='';
+  let acum=0;
+  for(let d=new Date(inicio);d<=fim;d.setMonth(d.getMonth()+1)){
+    const mes=new Date(d);
+    const lbl=mes.toLocaleDateString('pt-BR',{month:'short',year:'numeric'});
+    const isP=mes<hoje&&!(mes.getFullYear()===hoje.getFullYear()&&mes.getMonth()===hoje.getMonth());
+    const isA=mes.getFullYear()===hoje.getFullYear()&&mes.getMonth()===hoje.getMonth();
+    acum+=inssMes;
+    let cls='',sc='',st='';
+    if(isP){cls='retro';sc='sbadge retro';st='Retroativo';}
+    else if(isA){sc='sbadge atual';st='Mês atual';}
+    else{sc='sbadge fut';st='Futuro';}
+    const tr=document.createElement('tr');
+    if(isP)tr.classList.add('retro');
+    tr.innerHTML=`<td><strong>${lbl.toUpperCase()}</strong></td><td><span class="${sc}">${st}</span></td><td>${brl(rmtMin)}</td><td>${brl(inssMes)}</td><td>${brl(acum)}</td>`;
+    body.appendChild(tr);
+  }
+  document.getElementById('planFoot').innerHTML=`<div class="pf-item"><div class="pf-lbl">Total Meses</div><div class="pf-val">${mT}</div></div><div class="pf-item"><div class="pf-lbl">Remun. Mín. Mensal</div><div class="pf-val">${brl(rmtMin)}</div></div><div class="pf-item"><div class="pf-lbl">INSS Mensal Est.</div><div class="pf-val">${brl(inssMes)}</div></div>`;
+}
+function gerarProposta(){
+  if(!lastR){alert('Calcule a simulação primeiro.');return;}
+  const {p,r}=lastR;
+  const dados={
+    nomeCliente:document.getElementById('nomeCliente').value||'Cliente',
+    uf:p.uf,tipo:p.tipo,
+    areaConstrucao:p.areaConstrucao,areaReforma:p.areaReforma,areaPiscina:p.areaPiscina,
+    dataInicio:p.dataInicio,dataFim:p.dataFim,
+    inssDevido:r.inssDevido,inssComReducao:r.inssComReducao,
+    economiaImposto:r.economiaImposto,honorarios:r.honorarios,economiaLiq:r.economiaLiq,
+    retroativo:r.retroativo,futuro:r.futuro,mesesFuturos:r.mesesFuturos,parcelaMensal:r.parcelaMensal,
+    percHon:Math.round(p.percHonorarios*100),
+  };
+  localStorage.setItem('ciccarelli_proposta',JSON.stringify(dados));
+  window.open('template_planejamento_tributario.html','_blank');
+}
+initForm();
+</script>
+</body>
+</html>

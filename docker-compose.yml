@@ -1,0 +1,42 @@
+services:
+  cifra-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cifra
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cifra_secret_password}
+      POSTGRES_DB: cifra_calculadora
+    volumes:
+      - cifra-pgdata:/var/lib/postgresql/data
+
+  cifra-calculadora:
+    build:
+      context: ./calculadora
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3011:3000"
+    environment:
+      DATABASE_URL: "postgresql://cifra:${DB_PASSWORD:-cifra_secret_password}@cifra-db:5432/cifra_calculadora?schema=public"
+      NEXT_PUBLIC_BASE_PATH: ""
+      CALCULADORA_ADMIN_USER: ${CALCULADORA_ADMIN_USER}
+      CALCULADORA_ADMIN_PASSWORD: ${CALCULADORA_ADMIN_PASSWORD}
+      # Adicione outras variáveis de ambiente necessárias para a calculadora aqui
+    depends_on:
+      - cifra-db
+
+  cifra-website:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3010:3000" # Expondo para o Nginx na VPS
+    environment:
+      CALCULADORA_PROXY_URL: "http://cifra-calculadora:3000"
+      NEXT_PUBLIC_BASE_PATH: ""
+    depends_on:
+      - cifra-calculadora
+
+volumes:
+  cifra-pgdata:

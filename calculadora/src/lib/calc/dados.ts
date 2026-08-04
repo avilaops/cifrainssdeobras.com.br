@@ -83,10 +83,17 @@ export function isObraNaoPredial(tipo: TipoObraKey): boolean {
   return TIPOS_NAO_PREDIAIS.includes(tipo);
 }
 
-export function getVAU(uf: string, tipo: TipoObraKey): number {
+const MULT_MATERIAL: Record<string, number> = {
+  ALVENARIA: 1.0,
+  MADEIRA: 0.85,
+  MISTA: 0.92,
+};
+
+export function getVAU(uf: string, tipo: TipoObraKey, material = "ALVENARIA"): number {
   const base = VAU_BASE[uf] || VAU_BASE.SP;
   const mult = MULT_TIPO[tipo] || 1;
-  return Math.round(base * mult);
+  const multMat = MULT_MATERIAL[material] || 1;
+  return Math.round(base * mult * multMat);
 }
 
 /** Fator Social — apenas Pessoa Física em Obras Prediais (IN 2.021/2021). */
@@ -110,8 +117,12 @@ export function getReducaoFatorAjuste(areaTotalM2: number): number {
   return areaTotalM2 <= 350 ? 0.50 : 0.70;
 }
 
-export function mesesEntreDatas(dataInicio: string | Date, dataFim: string | Date): number {
+export function mesesEntreDatasRaw(dataInicio: string | Date, dataFim: string | Date): number {
   const d1 = new Date(dataInicio);
   const d2 = new Date(dataFim);
-  return Math.max(1, (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth()));
+  return (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+}
+
+export function mesesEntreDatas(dataInicio: string | Date, dataFim: string | Date): number {
+  return Math.max(1, mesesEntreDatasRaw(dataInicio, dataFim));
 }

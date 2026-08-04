@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Responsavel {
+  PF
+  PJ
+}
+
+enum TipoObra {
+  RESIDENCIAL
+  MULTIFAMILIAR
+  COMERCIAL
+  INDUSTRIAL
+  REFORMA
+  DEMOLICAO
+  PISCINA
+  MISTA
+  PAVIMENTACAO
+  TERRAPLENAGEM
+  OBRA_ARTE
+  DRENAGEM
+  NAO_PREDIAL
+}
+
+enum MaterialObra {
+  ALVENARIA
+  MADEIRA
+  MISTA
+}
+
+enum StatusSimulacao {
+  RASCUNHO
+  SIMULADO
+  PROPOSTA_ENVIADA
+  CONTRATADO
+  EM_REGULARIZACAO
+  CONCLUIDO
+  CANCELADO
+  MONITORAMENTO_CNO
+}
+
+enum TipoAuditoria {
+  CRIACAO
+  EDICAO
+  EXCLUSAO
+  RELATORIO_EMITIDO
+  STATUS_ALTERADO
+}
+
+model Cliente {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  nome      String
+  telefone  String?  @unique
+  email     String?  @unique
+  documento String?
+  obras     Obra[]
+  simulacoes Simulacao[]
+
+  @@map("clientes")
+}
+
+model Obra {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  clienteId String
+  cliente   Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  nome      String?
+  uf        String
+  tipoObra  TipoObra
+  dataInicio DateTime
+  dataFim    DateTime
+  simulacoes Simulacao[]
+
+  @@index([clienteId])
+  @@map("obras")
+}
+
+model Simulacao {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clienteId String?
+  cliente   Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  obraId    String?
+  obra      Obra?    @relation(fields: [obraId], references: [id], onDelete: SetNull)
+  status    StatusSimulacao @default(SIMULADO)
+  versao    Int @default(1)
+  versaoAnteriorId String?
+  versaoAnterior Simulacao? @relation("VersoesSimulacao", fields: [versaoAnteriorId], references: [id], onDelete: SetNull)
+  revisoes Simulacao[] @relation("VersoesSimulacao")
+  versaoCalculo String @default("2026.07")
+  fonteParametros String @default("IN RFB 2.021/2021 e Manual SERO")
+  competenciaVau String?
+  observacoes String?
+  criadoPor String @default("sistema")
+
+  // Contato
+  nomeCliente String
+  telefone    String?
+  email       String?
+
+  // Dados da obra
+  responsavel     Responsavel
+  uf              String
+  tipoObra        TipoObra
+  material        MaterialObra @default(ALVENARIA)
+  preMoldado      Boolean @default(false)
+  areaConstrucao  Float   @default(0)
+  areaReforma     Float   @default(0)
+  areaDemolicao   Float   @default(0)
+  areaPiscina     Float   @default(0)
+  concretoUsinado Boolean @default(false)
+  dataInicio      DateTime
+  dataFim         DateTime
+  vauManual       Float?
+  percHonorarios  Float   @default(0.30)
+
+  // Resultado (congelado no momento do calculo)
+  vauUsado        Float
+  areaTotal       Float
+  codTotal        Float
+  rmtTotal        Float
+  fatorSocial     Float
+  inssBruto       Float
+  inssDevido      Float
+  podeFatorAjuste Boolean
+  reducaoPercent  Float
+  inssComReducao  Float
+  economiaImposto Float
+  honorarios      Float
+  economiaLiquida Float
+  retroativo      Float
+  futuro          Float
+  mesesFuturos    Int
+  parcelaMensal   Float
+
+  // CRM
+  dataAlertaMonitoramento DateTime?
+
+  auditorias Auditoria[]
+
+  @@unique([versaoAnteriorId, versao])
+  @@index([clienteId])
+  @@index([obraId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("simulacoes")
+}
+
+model Auditoria {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  simulacaoId  String?
+  simulacao    Simulacao?    @relation(fields: [simulacaoId], references: [id], onDelete: SetNull)
+  tipo         TipoAuditoria
+  usuario      String
+  detalhes     String?
+
+  @@index([simulacaoId])
+  @@index([createdAt])
+  @@map("auditorias")
+}
+
+model VAUMensal {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  uf          String
+  competencia String   // Ex: "08/2026"
+  valorBase   Float
+
+  @@unique([uf, competencia])
+  @@map("vau_mensal")
+}

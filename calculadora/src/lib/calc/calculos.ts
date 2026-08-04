@@ -21,6 +21,7 @@ import {
   getVAU,
   isObraNaoPredial,
   mesesEntreDatas,
+  mesesEntreDatasRaw,
 } from "./dados";
 
 /** Alíquota total INSS obras na Aferição Indireta (Patronal 20% + Empregado ~9% + Terceiros ~7,8%). */
@@ -33,6 +34,8 @@ export interface SimulacaoInput {
   responsavel: "pf" | "pj";
   uf: string;
   tipo: TipoObraKey;
+  material?: string;
+  preMoldado?: boolean;
   areaConstrucao: number;
   areaReforma: number;
   areaDemolicao: number;
@@ -66,6 +69,8 @@ export interface SimulacaoResultado {
   retroativo: number;
   futuro: number;
   mesesFuturos: number;
+  mesesRetro: number;
+  multaMaed: number;
   parcelaMensal: number;
 }
 
@@ -77,10 +82,10 @@ export function calcularINSS(p: SimulacaoInput): SimulacaoResultado {
   const hoje = new Date();
 
   const vauManual = p.vauManual ?? 0;
-  const vau = vauManual > 0 ? vauManual : getVAU(p.uf, p.tipo);
-  const vauReforma = vauManual > 0 ? vauManual * 0.55 : getVAU(p.uf, "reforma");
-  const vauDemolicao = vauManual > 0 ? vauManual * 0.3 : getVAU(p.uf, "demolicao");
-  const vauPiscina = vauManual > 0 ? vauManual * 0.9 : getVAU(p.uf, "piscina");
+  const vau = vauManual > 0 ? vauManual : getVAU(p.uf, p.tipo, p.material);
+  const vauReforma = vauManual > 0 ? vauManual * 0.55 : getVAU(p.uf, "reforma", p.material);
+  const vauDemolicao = vauManual > 0 ? vauManual * 0.3 : getVAU(p.uf, "demolicao", p.material);
+  const vauPiscina = vauManual > 0 ? vauManual * 0.9 : getVAU(p.uf, "piscina", p.material);
 
   const areaConstrucao = p.areaConstrucao || 0;
   const areaReforma = p.areaReforma || 0;
@@ -133,19 +138,17 @@ export function calcularINSS(p: SimulacaoInput): SimulacaoResultado {
   const inssMinimoDctfweb = podeAjuste ? round2(rmtMinimaDctfweb * ALIQUOTA_PATRONAL) : inssDevido;
   const inssComReducao = inssMinimoDctfweb;
 
-  // 7. Economia Gerada
-  const economiaImposto = round2(inssDevido - inssComReducao);
-  const reducaoPercent = inssDevido > 0 ? (economiaImposto / inssDevido) * 100 : 0;
-  const honorarios = round2(economiaImposto * (p.percHonorarios || 0.30));
-  const economiaLiq = round2(economiaImposto - honorarios);
-
-  // 8. Parcelamento
+  // 7. Multa MAED (Atraso DCTFWeb) e Parcelamento
   const dataInicio = p.dataInicio;
   const dataFim = p.dataFim;
   const hojeStr = hoje.toISOString().slice(0, 10);
 
-  const mesesRetro = Math.max(0, mesesEntreDatas(dataInicio, hojeStr));
-  const mesesFuturos = Math.max(0, mesesEntreDatas(hojeStr, dataFim));
+  const diffRetro = mesesEntreDatasRaw(dataInicio, hojeStr);
+  const mesesRetro = Math.max(0, diffRetro);
+  const multaMaed = podeAjuste ? mesesRetro * 100 : 0;
+  
+  const diffFuturo = mesesEntreDatasRaw(hojeStr, dataFim);
+  const mesesFuturos = Math.max(0, diffFuturo);
   const mesesTotal = Math.max(1, mesesEntreDatas(dataInicio, dataFim));
 
   const proporcaoRetro = Math.min(1, mesesRetro / mesesTotal);
@@ -154,6 +157,12 @@ export function calcularINSS(p: SimulacaoInput): SimulacaoResultado {
   const retroativo = round2(inssComReducao * proporcaoRetro);
   const futuro = round2(inssComReducao * proporcaoFuturo);
   const parcelaMensal = mesesFuturos > 0 ? round2(futuro / mesesFuturos) : 0;
+
+  // 8. Economia Gerada (O custo total com planejamento é INSS + MAED)
+  const economiaImposto = round2(inssDevido - (inssComReducao + multaMaed));
+  const reducaoPercent = inssDevido > 0 ? (economiaImposto / inssDevido) * 100 : 0;
+  const honorarios = round2(economiaImposto * (p.percHonorarios || 0.30));
+  const economiaLiq = round2(economiaImposto - honorarios);
 
   return {
     vauUsado: vau,
@@ -177,6 +186,8 @@ export function calcularINSS(p: SimulacaoInput): SimulacaoResultado {
     retroativo,
     futuro,
     mesesFuturos,
+    mesesRetro,
+    multaMaed,
     parcelaMensal,
   };
 }

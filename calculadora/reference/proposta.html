@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Planejamento Tributário de Obra – Ciccarelli Arquitetura" />
+  <title>Planejamento Tributário de Obra – Ciccarelli Arquitetura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --c-black:      #111217;
+      --c-dark:       #1e2129;
+      --c-accent:     #1a56db;
+      --c-accent-dk:  #1240a8;
+      --c-accent-lt:  #dbeafe;
+      --c-gold:       #b5862a;
+      --c-success:    #2e7d51;
+      --c-success-lt: #dcf4e8;
+      --c-savings-lt: #c6edda;
+      --c-warn:       #b91c1c;
+      --c-grey-100:   #f4f6f9;
+      --c-grey-200:   #e8ecf1;
+      --c-grey-300:   #cdd4df;
+      --c-grey-500:   #8592a6;
+      --c-grey-700:   #4a5568;
+      --c-text:       #1e2129;
+      --radius: 3px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 10pt;
+      line-height: 1.5;
+      background: #c9d1db;
+      background-image: linear-gradient(135deg, #b8c4d4 0%, #cfd7e3 100%);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 36px 16px;
+      color: var(--c-text);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      box-shadow: 0 8px 40px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.08);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .page-accent {
+      height: 4px;
+      background: linear-gradient(90deg, var(--c-accent) 0%, var(--c-accent-dk) 60%, var(--c-gold) 100%);
+      flex-shrink: 0;
+    }
+    .page-inner {
+      padding: 10mm 14mm 16mm;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--c-grey-300);
+    }
+    .logo-box {
+      background: var(--c-black);
+      color: #fff;
+      padding: 7px 12px 8px;
+      text-align: center;
+      line-height: 1;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .logo-box::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--c-accent) 0%, var(--c-gold) 100%);
+    }
+    .logo-name {
+      display: block;
+      font-size: 16pt;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .logo-dots { display: flex; gap: 3px; justify-content: center; margin: 5px 0 4px; }
+    .logo-dots span { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.45); display: block; }
+    .logo-sub { display: block; font-size: 5.5pt; font-weight: 400; letter-spacing: 5px; text-transform: uppercase; color: rgba(255,255,255,.6); }
+    .header-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-left: 14px;
+      border-left: 1px solid var(--c-grey-300);
+    }
+    .header-info .info-name { font-size: 9.5pt; font-weight: 600; color: var(--c-dark); }
+    .header-info .info-detail { font-size: 8.5pt; color: var(--c-grey-700); }
+    .header-contact { text-align: right; font-size: 8.5pt; color: var(--c-grey-700); line-height: 1.7; flex-shrink: 0; }
+    .header-contact a { color: var(--c-accent); text-decoration: none; font-weight: 500; }
+    /* TITLE */
+    .title-block { text-align: center; margin-bottom: 18px; }
+    .doc-eyebrow { font-size: 7.5pt; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--c-accent); margin-bottom: 4px; }
+    .doc-title { font-size: 15pt; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--c-black); line-height: 1.2; }
+    .title-rule { display: flex; align-items: center; gap: 8px; margin-top: 8px; justify-content: center; }
+    .title-rule span { height: 1px; width: 40px; background: var(--c-grey-300); display: block; }
+    .title-rule i { width: 6px; height: 6px; border-radius: 50%; background: var(--c-accent); display: block; font-style: normal; }
+    /* PROJECT CARD */
+    .project-card {
+      background: var(--c-grey-100);
+      border: 1px solid var(--c-grey-200);
+      border-left: 3px solid var(--c-accent);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 24px;
+    }
+    .project-field { display: flex; gap: 5px; align-items: baseline; font-size: 9pt; }
+    .project-field .pf-label { font-weight: 700; text-transform: uppercase; font-size: 7.5pt; color: var(--c-grey-700); white-space: nowrap; letter-spacing: .3px; }
+    .project-field .pf-value { font-weight: 500; color: var(--c-dark); }
+    .project-field.full-width { grid-column: 1 / -1; }
+    /* SECTION HEADING */
+    .section-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .section-heading .sh-bar { width: 4px; height: 22px; background: linear-gradient(180deg, var(--c-accent) 0%, var(--c-accent-dk) 100%); border-radius: 2px; flex-shrink: 0; }
+    .section-heading .sh-text { font-size: 9.5pt; font-weight: 700; text-transform: uppercase; color: var(--c-dark); letter-spacing: .5px; white-space: nowrap; }
+    .section-heading .sh-line { flex: 1; height: 1px; background: var(--c-grey-200); }
+    /* TABLES */
+    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 16px; font-size: 9pt; }
+    /* Client table */
+    .client-table { border: 1px solid var(--c-grey-300); border-radius: var(--radius); overflow: hidden; }
+    .client-table td { padding: 7px 12px; border-bottom: 1px solid var(--c-grey-200); }
+    .client-table tr:last-child td { border-bottom: none; }
+    .client-table td:first-child { font-weight: 700; text-transform: uppercase; font-size: 7.5pt; letter-spacing: .4px; color: var(--c-grey-700); background: var(--c-grey-100); width: 36%; border-right: 1px solid var(--c-grey-200); }
+    .client-table td:last-child { font-weight: 600; color: var(--c-dark); background: #fff; text-align: center; }
+    /* Values table */
+    .values-table { border: 1px solid var(--c-grey-300); border-radius: var(--radius); overflow: hidden; }
+    .values-table thead td { background: var(--c-dark); padding: 8px 12px; font-weight: 700; font-size: 8pt; text-transform: uppercase; letter-spacing: .5px; color: #fff; text-align: center; border-right: 1px solid rgba(255,255,255,.15); }
+    .values-table thead td:last-child { border-right: none; }
+    .values-table tbody td { padding: 7px 12px; border-bottom: 1px solid var(--c-grey-200); border-right: 1px solid var(--c-grey-200); }
+    .values-table tbody td:last-child { border-right: none; }
+    .values-table tbody tr:last-child td { border-bottom: none; }
+    .row-base td { background: #fff; }
+    .row-base td.currency { font-size: 8pt; color: var(--c-grey-700); }
+    .row-base td.amount { font-weight: 700; text-align: right; font-size: 10pt; color: var(--c-dark); }
+    .row-economia td { background: var(--c-savings-lt); }
+    .row-economia td.label-col { font-weight: 700; font-size: 8pt; text-transform: uppercase; color: var(--c-success); }
+    .row-economia td.amount { font-weight: 800; font-size: 10pt; color: var(--c-success); text-align: right; }
+    .row-economia td.currency { font-size: 8pt; color: var(--c-success); }
+    .row-honorario td { background: var(--c-accent-lt); }
+    .row-honorario td.label-col { font-weight: 700; font-size: 8pt; text-transform: uppercase; color: var(--c-accent-dk); }
+    .row-honorario td.amount { font-weight: 700; font-size: 10pt; color: var(--c-accent-dk); text-align: right; }
+    .row-honorario td.currency { font-size: 8pt; color: var(--c-accent-dk); }
+    .row-liquida td { background: var(--c-success); }
+    .row-liquida td.label-col { font-weight: 800; font-size: 8.5pt; text-transform: uppercase; color: #fff; }
+    .row-liquida td.amount { font-weight: 800; font-size: 11pt; color: #fff; text-align: right; }
+    .row-liquida td.currency { font-size: 8pt; color: rgba(255,255,255,.8); }
+    /* PAYMENT */
+    .payment-section { margin-top: 4px; }
+    .alert-box { border-left: 3px solid var(--c-warn); background: #fff5f5; padding: 8px 12px; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 10px; }
+    .alert-box p { font-size: 8.5pt; color: var(--c-warn); font-style: italic; line-height: 1.5; font-weight: 500; }
+    .info-box { border-left: 3px solid var(--c-grey-300); padding: 6px 12px; margin-bottom: 16px; }
+    .info-box p { font-size: 8.5pt; color: var(--c-grey-700); line-height: 1.5; }
+    .payment-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pay-card { background: var(--c-grey-100); border: 1px solid var(--c-grey-200); border-radius: var(--radius); padding: 10px 14px; }
+    .pay-card .pc-label { font-size: 7.5pt; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--c-grey-500); margin-bottom: 4px; }
+    .pay-card .pc-value { font-size: 12pt; font-weight: 800; }
+    .pay-card .pc-obs { font-size: 7.5pt; color: var(--c-grey-500); margin-top: 3px; font-style: italic; }
+    .pay-card.retroativo { border-top: 3px solid var(--c-warn); }
+    .pay-card.retroativo .pc-value { color: var(--c-warn); }
+    .pay-card.futuro { border-top: 3px solid var(--c-accent); }
+    .pay-card.futuro .pc-value { color: var(--c-accent); }
+    /* FOOTER */
+    .footer { margin-top: auto; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--c-grey-200); }
+    .footer-left { font-size: 8pt; color: var(--c-grey-500); }
+    .footer-left strong { color: var(--c-grey-700); }
+    .footer-center { font-size: 8.5pt; color: var(--c-grey-700); font-weight: 500; text-align: center; }
+    .footer-right { font-size: 8pt; color: var(--c-grey-500); text-align: right; display: flex; align-items: center; gap: 5px; }
+    .page-number { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--c-grey-300); font-size: 8pt; color: var(--c-grey-700); font-weight: 600; }
+    @media print {
+      body { background: none; padding: 0; }
+      .page { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="page-accent"></div>
+  <div class="page-inner">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo-box">
+        <span class="logo-name">CICCARELLI</span>
+        <div class="logo-dots"><span></span><span></span><span></span><span></span></div>
+        <span class="logo-sub">Arquitetura</span>
+      </div>
+      <div class="header-info">
+        <span class="info-name">Arq. Vinícius Ciccarelli</span>
+        <span class="info-detail">(17) 9 9743 – 2052 &nbsp;·&nbsp; CAU SP: A154637-6</span>
+      </div>
+      <div class="header-contact">
+        <a href="mailto:Ciccarelli.arq@gmail.com">Ciccarelli.arq@gmail.com</a><br>
+        Votuporanga / SP
+      </div>
+    </header>
+
+    <!-- TITLE -->
+    <div class="title-block">
+      <div class="doc-eyebrow">Documento de Proposta</div>
+      <h1 class="doc-title">Planejamento Tributário de Obra</h1>
+      <div class="title-rule"><span></span><i></i><span></span></div>
+    </div>
+
+    <!-- PROJECT CARD -->
+    <div class="project-card">
+      <div class="project-field full-width">
+        <span class="pf-label">Projeto:</span>
+        <span class="pf-value">Construção em andamento</span>
+      </div>
+      <div class="project-field">
+        <span class="pf-label">Localização:</span>
+        <span class="pf-value">Votuporanga – SP</span>
+      </div>
+      <div class="project-field">
+        <span class="pf-label">Metragem:</span>
+        <span class="pf-value">220,18 m²</span>
+      </div>
+      <div class="project-field">
+        <span class="pf-label">Período:</span>
+        <span class="pf-value">12/2025 a 12/2026</span>
+      </div>
+      <div class="project-field">
+        <span class="pf-label">Cliente:</span>
+        <span class="pf-value">Fausto Augusto Matta</span>
+      </div>
+    </div>
+
+    <!-- SIMULATION -->
+    <div class="section-heading">
+      <div class="sh-bar"></div>
+      <span class="sh-text">Simulação de Redução para o INSS de Obras</span>
+      <div class="sh-line"></div>
+    </div>
+
+    <table class="client-table">
+      <tbody>
+        <tr><td>Nome do Cliente</td><td>Fausto Augusto Matta</td></tr>
+        <tr><td>Cidade da Obra</td><td>Votuporanga – SP</td></tr>
+        <tr><td>Metragem</td><td>220,18 m²</td></tr>
+        <tr><td>Data</td><td>24 de junho de 2026</td></tr>
+      </tbody>
+    </table>
+
+    <table class="values-table">
+      <thead>
+        <tr>
+          <td colspan="2">INSS Devido (sem redução)</td>
+          <td colspan="2">INSS com Redução</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-base">
+          <td class="currency">R$</td>
+          <td class="amount">21.038,47</td>
+          <td class="currency">R$</td>
+          <td class="amount">6.643,24</td>
+        </tr>
+        <tr class="row-economia">
+          <td class="label-col" colspan="2">Economia em Imposto</td>
+          <td class="currency">R$</td>
+          <td class="amount">14.395,23</td>
+        </tr>
+        <tr class="row-honorario">
+          <td class="label-col" colspan="2">Valor dos Honorários</td>
+          <td class="currency">R$</td>
+          <td class="amount">4.318,57</td>
+        </tr>
+        <tr class="row-liquida">
+          <td class="label-col" colspan="2">Economia Líquida</td>
+          <td class="currency">R$</td>
+          <td class="amount">10.076,66</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- PAYMENT -->
+    <div class="payment-section">
+      <div class="section-heading" style="margin-bottom:10px;">
+        <div class="sh-bar"></div>
+        <span class="sh-text">Forma de Pagamento dos Impostos</span>
+        <div class="sh-line"></div>
+        <span style="font-size:9.5pt;font-weight:800;color:var(--c-accent);white-space:nowrap;padding-left:6px;">R$ 6.643,24</span>
+      </div>
+
+      <div class="alert-box">
+        <p>Quando existe um período retroativo, o imposto deste período é emitido integralmente no dia em que forem enviadas as informações.</p>
+      </div>
+
+      <div class="info-box">
+        <p>Os meses de hoje para frente são pagos mensalmente até o mês da emissão do habite-se.</p>
+      </div>
+
+      <div class="payment-cards">
+        <div class="pay-card retroativo">
+          <div class="pc-label">Período Retroativo</div>
+          <div class="pc-value">R$ 3.564,85</div>
+          <div class="pc-obs">Emitido integralmente na data de envio</div>
+        </div>
+        <div class="pay-card futuro">
+          <div class="pc-label">Período Futuro</div>
+          <div class="pc-value">R$ 3.078,39</div>
+          <div class="pc-obs">Pago mensalmente até o habite-se</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-left">Emitido em<br><strong>24 de junho de 2026</strong></div>
+      <div class="footer-center">Ciccarelli Arquitetura<br>Votuporanga / SP</div>
+      <div class="footer-right">Página <span class="page-number">1</span></div>
+    </footer>
+
+  </div>
+</div>
+
+<script>
+// ── Auto-populate from simulator (localStorage) ──────────────────
+(function(){
+  const raw = localStorage.getItem('ciccarelli_proposta');
+  if (!raw) return; // use static values if not called from simulator
+
+  const d = JSON.parse(raw);
+
+  function brl(v) {
+    return Number(v).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  }
+  function brlNum(v) {
+    return Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function fmtMes(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('pt-BR', {month:'2-digit', year:'numeric'}).replace('/', '/');
+  }
+  function fmtDataHoje() {
+    return new Date().toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'});
+  }
+
+  // Helper to set text in element by selector
+  function set(sel, val) {
+    const el = document.querySelector(sel);
+    if (el) el.textContent = val;
+  }
+  function setAll(sel, val) {
+    document.querySelectorAll(sel).forEach(el => el.textContent = val);
+  }
+
+  // ── Project info card ──────────────────────────────────
+  const cards = document.querySelectorAll('.pf-value');
+  const labels = document.querySelectorAll('.pf-label');
+  labels.forEach((lbl, i) => {
+    const t = lbl.textContent.toLowerCase();
+    if (t.includes('projeto')) cards[i].textContent = 'Construção em andamento';
+    if (t.includes('localiza')) cards[i].textContent = `${d.uf}`;
+    if (t.includes('metragem')) cards[i].textContent = `${Number(d.areaConstrucao).toLocaleString('pt-BR', {minimumFractionDigits:2})} m²`;
+    if (t.includes('período')) cards[i].textContent = `${fmtMes(d.dataInicio)} a ${fmtMes(d.dataFim)}`;
+    if (t.includes('cliente')) cards[i].textContent = d.nomeCliente;
+  });
+
+  // ── Client table ───────────────────────────────────────
+  const clientTds = document.querySelectorAll('.client-table td:last-child');
+  if (clientTds.length >= 4) {
+    clientTds[0].textContent = d.nomeCliente;
+    clientTds[1].textContent = d.uf;
+    clientTds[2].textContent = `${Number(d.areaConstrucao).toLocaleString('pt-BR', {minimumFractionDigits:2})} m²`;
+    clientTds[3].textContent = fmtDataHoje();
+  }
+
+  // ── Values table ───────────────────────────────────────
+  const rowBase = document.querySelector('.row-base');
+  if (rowBase) {
+    const amts = rowBase.querySelectorAll('.amount');
+    if (amts[0]) amts[0].textContent = brlNum(d.inssDevido);
+    if (amts[1]) amts[1].textContent = brlNum(d.inssComReducao);
+  }
+  const rowEco = document.querySelector('.row-economia .amount');
+  if (rowEco) rowEco.textContent = brlNum(d.economiaImposto);
+  const rowHon = document.querySelector('.row-honorario .amount');
+  if (rowHon) rowHon.textContent = brlNum(d.honorarios);
+  const rowLiq = document.querySelector('.row-liquida .amount');
+  if (rowLiq) rowLiq.textContent = brlNum(d.economiaLiq);
+
+  // ── Payment section ────────────────────────────────────
+  const payHeadVal = document.querySelector('.section-heading span[style*="c-accent"]');
+  if (payHeadVal) payHeadVal.textContent = brl(d.inssComReducao);
+
+  const payCards = document.querySelectorAll('.pay-card');
+  payCards.forEach(card => {
+    const lbl = card.querySelector('.pc-label');
+    if (!lbl) return;
+    const val = card.querySelector('.pc-value');
+    const obs = card.querySelector('.pc-obs');
+    if (lbl.textContent.includes('Retroativo')) {
+      if (val) val.textContent = brl(d.retroativo);
+    } else if (lbl.textContent.includes('Futuro')) {
+      if (val) val.textContent = brl(d.futuro);
+      if (obs && d.mesesFuturos > 0) {
+        obs.textContent = `${d.mesesFuturos} parcelas de ${brl(d.parcelaMensal)}/mês`;
+      }
+    }
+  });
+
+  // ── Footer ─────────────────────────────────────────────
+  const footLeft = document.querySelector('.footer-left');
+  if (footLeft) footLeft.innerHTML = `Emitido em<br><strong>${fmtDataHoje()}</strong>`;
+
+  // ── Document title update ──────────────────────────────
+  document.title = `Planejamento INSS – ${d.nomeCliente} – Ciccarelli Arquitetura`;
+})();
+</script>
+</body>
+</html>
