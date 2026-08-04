@@ -67,6 +67,14 @@ export async function salvarSimulacao(input: SalvarSimulacaoInput) {
         },
       });
 
+      if (parsed.vauManual && parsed.vauManual > 0 && parsed.competenciaVau) {
+        await tx.vAUMensal.upsert({
+          where: { uf_competencia: { uf: parsed.uf, competencia: parsed.competenciaVau } },
+          update: { valorBase: parsed.vauManual },
+          create: { uf: parsed.uf, competencia: parsed.competenciaVau, valorBase: parsed.vauManual }
+        });
+      }
+
       const registro = await tx.simulacao.create({ data: {
         clienteId: cliente.id,
         obraId: obra.id,
@@ -245,3 +253,22 @@ export async function revisarSimulacao(id: string, input: SalvarSimulacaoInput) 
     return { error: e.message || "Erro inesperado ao revisar simulação." };
   }
 }
+
+export async function consultarVau(uf: string, dataFim: string) {
+  try {
+    const d = new Date(dataFim);
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const y = d.getFullYear();
+    const competencia = `${m}/${y}`;
+
+    const vau = await prisma.vAUMensal.findUnique({
+      where: { uf_competencia: { uf, competencia } }
+    });
+
+    return { competencia, valor: vau?.valorBase || null };
+  } catch (error) {
+    console.error("Erro ao consultar VAU:", error);
+    return { competencia: "", valor: null };
+  }
+}
+

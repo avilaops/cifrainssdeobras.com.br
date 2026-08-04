@@ -11,7 +11,7 @@ import {
 import { calcularINSS, brl, num, type SimulacaoInput } from "@/lib/calc/calculos";
 import { TIPOS_OBRA, isObraNaoPredial, type TipoObraKey } from "@/lib/calc/dados";
 import { gerarPlanoMensal } from "@/lib/calc/planejador";
-import { salvarSimulacao } from "@/app/actions";
+import { salvarSimulacao, consultarVau } from "@/app/actions";
 import { AnimatedNumber } from "@/components/animated-number";
 import { sair } from "@/app/login/actions";
 import { trackAnonymous } from "@/lib/analytics";
@@ -56,6 +56,24 @@ export default function Home() {
   const [salvando, setSalvando] = React.useState(false);
   const [salvo, setSalvo] = React.useState<string | null>(null);
   const [erro, setErro] = React.useState<string | null>(null);
+  const [mensagemVau, setMensagemVau] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!uf || !dataFim) return;
+    consultarVau(uf, dataFim).then((res) => {
+      setCompetenciaVau(res.competencia);
+      if (res.valor) {
+        setVauManual(res.valor);
+        setVauManualAtivo(true);
+        setMensagemVau(`✅ VAU recuperado do banco de dados para ${uf} - ${res.competencia} (R$ ${res.valor}).`);
+      } else {
+        setVauManualAtivo(true);
+        setVauManual(0);
+        setMensagemVau(`⚠️ VAU não cadastrado para ${uf} - ${res.competencia}. Por favor, insira o valor atualizado.`);
+      }
+    });
+  }, [uf, dataFim]);
+
 
   const input: SimulacaoInput = {
     responsavel,
@@ -219,8 +237,19 @@ export default function Home() {
 
           <SecTitle icon={Gauge}>VAU Personalizado</SecTitle>
           <Toggle label="Inserir VAU manualmente?" checked={vauManualAtivo} onChange={setVauManualAtivo} />
+          
+          {mensagemVau && (
+            <div className={`mt-2 p-3 text-[11px] rounded-lg border ${
+              mensagemVau.includes('✅') 
+                ? 'bg-olive-500/10 border-olive-400/30 text-olive-600' 
+                : 'bg-gold/10 border-gold/30 text-gold'
+            }`}>
+              {mensagemVau}
+            </div>
+          )}
+
           <AnimatedReveal show={vauManualAtivo}>
-            <div className="rounded-lg border border-gold/25 bg-gradient-to-br from-gold/10 to-transparent p-3">
+            <div className="rounded-lg border border-gold/25 bg-gradient-to-br from-gold/10 to-transparent p-3 mt-2">
               <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-gold uppercase">
                 <Sparkles className="size-3" /> VAU Atual (R$/m²)
               </p>
