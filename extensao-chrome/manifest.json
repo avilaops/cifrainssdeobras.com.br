@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Ávila Ops - Integração e-CAC",
+  "version": "1.0",
+  "description": "Extensão oficial da Ávila Ops para capturar e sincronizar sessões do e-CAC de forma segura.",
+  "permissions": [
+    "cookies",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://cav.receita.fazenda.gov.br/*",
+    "*://*.cifrainssdeobras.com.br/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

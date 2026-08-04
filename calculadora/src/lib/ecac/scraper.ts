@@ -66,3 +66,53 @@ export async function createECACSession(certContext: CertificateContext) {
     throw error;
   }
 }
+
+export type CookieFormat = {
+  name: string;
+  value: string;
+  domain: string;
+  path: string;
+  secure: boolean;
+  httpOnly: boolean;
+};
+
+export async function createSessionFromCookies(cookies: CookieFormat[]) {
+  // Launch puppeteer without needing a custom nssdb
+  const browser = await puppeteer.launch({
+    executablePath: '/usr/bin/chromium-browser',
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+    ]
+  });
+
+  const page = await browser.newPage();
+  
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+  await page.setViewport({ width: 1366, height: 768 });
+
+  try {
+    // Injetar os cookies capturados pela extensão
+    await page.setCookie(...cookies);
+
+    console.log('Navigating to eCAC with injected cookies...');
+    // Acessar uma página restrita do e-CAC para validar os cookies
+    await page.goto('https://cav.receita.fazenda.gov.br/ecac/Aplicacao.aspx?id=10009&origem=menu', { waitUntil: 'networkidle2' });
+
+    console.log('Successfully accessed eCAC via Cookies');
+
+    const screenshot = await page.screenshot({ encoding: 'base64' });
+
+    return {
+      browser,
+      page,
+      screenshot
+    };
+
+  } catch (error) {
+    await browser.close();
+    throw error;
+  }
+}
