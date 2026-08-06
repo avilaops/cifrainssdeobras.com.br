@@ -12,8 +12,8 @@ describe("motor de cálculo (IN RFB 2.021/2021)", () => {
       areaDemolicao: 0,
       areaPiscina: 0,
       concretoUsinado: false,
-      dataInicio: "2024-01-01",
-      dataFim: "2024-12-01",
+      dataInicio: "2026-08-01",
+      dataFim: "2027-08-01",
       vauManual: 2410.53,
       percHonorarios: 0.3,
     };
@@ -27,7 +27,7 @@ describe("motor de cálculo (IN RFB 2.021/2021)", () => {
     expect(res.inssDevido).toBeCloseTo(9994.85, 1);
     expect(res.rmtMinimaDctfweb).toBeCloseTo(13579.96, 1);
     expect(res.inssComReducao).toBeCloseTo(2715.99, 1);
-    expect(res.economiaImposto).toBeCloseTo(7278.86, 1);
+    expect(res.economiaImposto).toBeCloseTo(7178.86, 1);
   });
 
   it("não aplica fator social nem ajuste em obra não predial", () => {

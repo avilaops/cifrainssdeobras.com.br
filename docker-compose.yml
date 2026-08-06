@@ -21,7 +21,6 @@ services:
       NEXT_PUBLIC_BASE_PATH: ""
       CALCULADORA_ADMIN_USER: ${CALCULADORA_ADMIN_USER}
       CALCULADORA_ADMIN_PASSWORD: ${CALCULADORA_ADMIN_PASSWORD}
-      # Adicione outras variáveis de ambiente necessárias para a calculadora aqui
     depends_on:
       - cifra-db
 
@@ -31,12 +30,10 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3010:3000" # Expondo para o Nginx na VPS
+      - "127.0.0.1:3010:3000" # Expondo para o Nginx na VPS (cifrainssdeobras.com.br)
     environment:
-      CALCULADORA_PROXY_URL: "http://cifra-calculadora:3000"
+      NEXT_PUBLIC_CALCULADORA_URL: "https://app.cifrainssdeobras.com"
       NEXT_PUBLIC_BASE_PATH: ""
-    depends_on:
-      - cifra-calculadora
 
 volumes:
   cifra-pgdata:

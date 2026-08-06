@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { calcularINSS, type SimulacaoInput } from "@/lib/calc/calculos";
 import type { TipoObraKey } from "@/lib/calc/dados";
 import { AUTH_COOKIE, getSessionUser } from "@/lib/auth";
-import { normalizeTelefone, simulacaoSchema } from "@/lib/validation";
+import { normalizeTelefone, simulacaoSchema } from "@/lib/validations";
 
 const TIPO_PRISMA: Record<TipoObraKey, TipoObra> = {
   residencial: "RESIDENCIAL",
@@ -38,15 +38,34 @@ async function usuarioAtual() {
   return (await getSessionUser(cookieStore.get(AUTH_COOKIE)?.value)) || "sistema";
 }
 
-function dadosResultado(input: SalvarSimulacaoInput) {
+async function dadosResultado(input: SalvarSimulacaoInput) {
   const parsed = simulacaoSchema.parse(input);
-  const resultado = calcularINSS(parsed);
+  
+  const parametros = await prisma.parametrosImpostos.findUnique({ where: { competencia: "2026" } });
+  const dbParam = parametros ? {
+    percentualUsinado: parametros.percentualUsinado,
+    preMoldadoMenor40: parametros.preMoldadoMenor40,
+    preMoldadoMaior40: parametros.preMoldadoMaior40,
+  } : undefined;
+
+  const regrasArray = await prisma.regraReducaoIRPF.findMany({ where: { competencia: "2026" } });
+  const dbRegras = regrasArray.length >= 2 ? {
+    minPercentDctfwebAte350: regrasArray[0].minPercentDctfweb,
+    minPercentDctfwebMais350: regrasArray[1].minPercentDctfweb,
+  } : undefined;
+
+  const resultado = calcularINSS(parsed, dbParam, dbRegras);
   return { parsed, resultado };
+}
+
+export async function calcularSimulacaoAction(input: SalvarSimulacaoInput) {
+  const { resultado } = await dadosResultado(input);
+  return resultado;
 }
 
 export async function salvarSimulacao(input: SalvarSimulacaoInput) {
   try {
-    const { parsed, resultado } = dadosResultado(input);
+    const { parsed, resultado } = await dadosResultado(input);
     const usuario = await usuarioAtual();
     const telefone = normalizeTelefone(parsed.telefone) || null;
     const email = parsed.email.toLowerCase() || null;
@@ -191,7 +210,7 @@ export async function revisarSimulacao(id: string, input: SalvarSimulacaoInput) 
   try {
     const anterior = await prisma.simulacao.findUnique({ where: { id } });
     if (!anterior) return { error: "Simulação original não encontrada." };
-    const { parsed, resultado } = dadosResultado(input);
+    const { parsed, resultado } = await dadosResultado(input);
     const usuario = await usuarioAtual();
 
     const registro = await prisma.simulacao.create({

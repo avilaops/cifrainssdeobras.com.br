@@ -1,8 +1,9 @@
 import { cookies } from "next/headers";
 import { getSessionUser, AUTH_COOKIE } from "@/lib/auth";
-import { Settings } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
+import Link from "next/link";
+import { SlidersHorizontal, FileText, TrendingDown, Users, Calculator } from "lucide-react";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -21,13 +22,15 @@ export default async function DashboardPage() {
     }
   });
 
-  // Prepara dados para os gráficos
+  const economiaTotal = todasSimulacoes.reduce((acc, s) => acc + s.economiaLiquida, 0);
+  const inssDevidoTotal = todasSimulacoes.reduce((acc, s) => acc + s.inssDevido, 0);
+  const clientesUnicos = new Set(todasSimulacoes.map(s => s.nomeCliente)).size;
+
   const dataReducao = [
-    { name: "INSS Devido (Pago)", value: todasSimulacoes.reduce((acc, s) => acc + s.inssDevido, 0) },
-    { name: "Economia Gerada", value: todasSimulacoes.reduce((acc, s) => acc + s.economiaLiquida, 0) },
+    { name: "INSS Devido (Pago)", value: inssDevidoTotal },
+    { name: "Economia Gerada", value: economiaTotal },
   ];
 
-  // Top Clientes
   const clientesMap = new Map<string, { totalINSS: number, economia: number }>();
   todasSimulacoes.forEach(s => {
     const prev = clientesMap.get(s.nomeCliente) || { totalINSS: 0, economia: 0 };
@@ -39,9 +42,8 @@ export default async function DashboardPage() {
   const dataClientes = Array.from(clientesMap.entries())
     .map(([name, vals]) => ({ name, ...vals }))
     .sort((a, b) => b.totalINSS - a.totalINSS)
-    .slice(0, 5); // top 5
+    .slice(0, 5);
 
-  // Data X INSS (por mês)
   const tempoMap = new Map<string, { inssBruto: number, inssDevido: number }>();
   todasSimulacoes.forEach(s => {
     const mesAno = `${String(s.createdAt.getMonth() + 1).padStart(2, '0')}/${s.createdAt.getFullYear()}`;
@@ -52,74 +54,92 @@ export default async function DashboardPage() {
     });
   });
   const dataTempo = Array.from(tempoMap.entries()).map(([name, vals]) => ({ name, ...vals }));
-  
-  const now = new Date();
-  const formattedDate = now.toLocaleDateString("pt-BR", { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const formattedTime = now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+
+  const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  const firstInitial = username.charAt(0).toUpperCase();
 
   return (
-    <div className="flex flex-col items-center py-10 px-4 max-w-4xl mx-auto w-full">
-      <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-10 relative mb-12">
-        {/* Settings button */}
-        <button className="absolute top-6 right-6 w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
-          <Settings className="w-5 h-5" />
-        </button>
+    <div className="min-h-screen bg-[#f5f5ef]">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
 
-        {/* Welcome Section */}
-        <div className="flex items-center gap-6 mb-12 justify-center">
-          <div className="w-24 h-24 rounded-full bg-black flex flex-col items-center justify-center border-4 border-amber-500 shrink-0">
-            <span className="text-amber-500 font-bold text-2xl leading-none">Calc</span>
-            <span className="text-white font-bold text-[10px] leading-none">ProObra</span>
-            <span className="text-amber-500 text-[5px] mt-1">Márcio Medeiros</span>
-          </div>
-          <div className="flex flex-col justify-center">
-            <p className="text-gray-500 text-sm mb-1">Bem-vindo ao sistema</p>
-            <h2 className="text-amber-500 text-2xl font-bold tracking-wide uppercase">{username}</h2>
-          </div>
-        </div>
-
-        {/* Metrics Grid */}
-        <div className="max-w-md mx-auto space-y-4">
-          <div className="border border-gray-200 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">Tempo ganho</p>
-            <p className="font-bold text-lg text-gray-900">Menos de 1h</p>
-          </div>
-          
-          <div className="border border-gray-200 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">PDF Gerados</p>
-            <p className="font-bold text-lg text-gray-900">{totalSimulacoes}</p>
-          </div>
-
-          <div className="border border-gray-200 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">Data & Hora:</p>
-            <p className="font-bold text-lg text-gray-900">{formattedDate} | Hora: {formattedTime}</p>
-          </div>
-
-          <div className="border border-gray-200 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">Plano atual</p>
-            <p className="font-bold text-lg text-gray-900">ESPECIALISTA</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Selects & Charts */}
-      <div className="w-full max-w-4xl space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-md mx-auto">
+        {/* Welcome Bar */}
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <label className="block text-sm font-serif text-[#002D62] mb-2">Aferição</label>
-            <select className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-              <option>Simulador: Obra Predial</option>
-              <option>Calculadora: eSocial (em breve)</option>
-              <option>Calculadora: GPS Espontânea (em breve)</option>
-              <option>Calculadora: GFIP (em breve)</option>
-            </select>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#4a6b5a]">Painel de controle</p>
+            <h1 className="mt-0.5 text-xl font-bold text-[#1b3629]">
+              Olá, {username.split("@")[0].charAt(0).toUpperCase() + username.split("@")[0].slice(1)}
+            </h1>
+          </div>
+
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1b3629] text-sm font-bold text-white shadow-md">
+            {firstInitial}
           </div>
         </div>
 
-        <DashboardCharts dataClientes={dataClientes} dataReducao={dataReducao} dataTempo={dataTempo} />
-        
-        <p className="text-center text-sm text-gray-500 mt-8 pt-8">
-          Métricas consolidadas com base nas simulações salvas.
+        {/* KPI Strip */}
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-[#d8dbd1] bg-white/70 p-5 backdrop-blur-sm">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#4a6b5a]">Simulações</p>
+              <div className="flex size-8 items-center justify-center rounded-lg bg-[#eef0eb]">
+                <FileText className="size-4 text-[#1b3629]" />
+              </div>
+            </div>
+            <p className="text-3xl font-black tracking-tight text-[#1b3629]">{totalSimulacoes}</p>
+            <p className="mt-1 text-xs text-[#6b7a70]">memórias de cálculo geradas</p>
+          </div>
+
+          <div className="rounded-2xl border border-[#d8dbd1] bg-white/70 p-5 backdrop-blur-sm">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#4a6b5a]">Economia Total</p>
+              <div className="flex size-8 items-center justify-center rounded-lg bg-[#eef0eb]">
+                <TrendingDown className="size-4 text-[#1b3629]" />
+              </div>
+            </div>
+            <p className="text-2xl font-black tracking-tight text-[#1b3629]">{brl(economiaTotal)}</p>
+            <p className="mt-1 text-xs text-[#6b7a70]">economia líquida gerada aos clientes</p>
+          </div>
+
+          <div className="rounded-2xl border border-[#d8dbd1] bg-white/70 p-5 backdrop-blur-sm">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#4a6b5a]">Clientes</p>
+              <div className="flex size-8 items-center justify-center rounded-lg bg-[#eef0eb]">
+                <Users className="size-4 text-[#1b3629]" />
+              </div>
+            </div>
+            <p className="text-3xl font-black tracking-tight text-[#1b3629]">{clientesUnicos}</p>
+            <p className="mt-1 text-xs text-[#6b7a70]">clientes únicos no sistema</p>
+          </div>
+        </div>
+
+        {/* Quick Access */}
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { href: "/simulador-obra-predial", icon: SlidersHorizontal, label: "Simulador INSS" },
+            { href: "/calculadora-reducao-irpf", icon: Calculator, label: "Redução IRPF" },
+            { href: "/simulacoes", icon: FileText, label: "Simulações salvas" },
+            { href: "/simulador-reforma-tributaria", icon: TrendingDown, label: "Reforma Tributária" },
+          ].map(({ href, icon: Icon, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="flex flex-col items-center gap-2 rounded-xl border border-[#d8dbd1] bg-white/60 p-4 text-center text-xs font-semibold text-[#1b3629] transition-all hover:border-[#1b3629]/30 hover:bg-white hover:shadow-sm"
+            >
+              <Icon className="size-5 text-[#2e5240]" />
+              {label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Charts */}
+        <div className="rounded-2xl border border-[#d8dbd1] bg-white/70 p-6 backdrop-blur-sm">
+          <p className="mb-5 text-[10px] font-bold uppercase tracking-widest text-[#4a6b5a]">Análise de Simulações</p>
+          <DashboardCharts dataClientes={dataClientes} dataReducao={dataReducao} dataTempo={dataTempo} />
+        </div>
+
+        <p className="mt-6 text-center text-[11px] text-[#8a9890]">
+          Métricas consolidadas com base nas {totalSimulacoes} simulações salvas no sistema.
         </p>
       </div>
     </div>

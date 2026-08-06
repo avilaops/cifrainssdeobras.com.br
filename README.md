@@ -1,56 +1,33 @@
-# CIFRA - website institucional
+# CIFRA - Consultoria Tributária de Obra (Portal do Cliente)
 
-Website em Next.js para a CIFRA - Consultoria Tributária de Obra.
+Sistema integrado (Calculadora + Website) para planejamento tributário e cálculo de redução de INSS de obra e Reforma Tributária.
 
-## Desenvolvimento
+> 📚 **[Acessar a Base de Conhecimento e Acervo Documental (Leis, Regras e Manuais)](file:///D:/Administrativo/Websites/CIFRA/docs/README.md)**
 
+## Módulos do Sistema
+
+## Arquitetura e Integração
+Este projeto é uma aplicação **Next.js (App Router)** rodando em modo Server-Side Rendering (SSR). 
+Ele funciona de forma independente, mas está **visualmente e estruturalmente integrado ao Website da CIFRA** (que é estático).
+
+A integração ocorre via proxy no `website` (Next.js rewrites).
+- O site roda na porta `3001` e a calculadora na porta `3002`.
+- Requisições para `cifrainssdeobras.com.br/calculadora` são interceptadas pelo site e redirecionadas silenciosamente para esta aplicação.
+- A calculadora compartilha os mesmos componentes de layout (Topbar, Header, Footer) para garantir uma experiência unificada e premium para o cliente.
+
+## Tecnologias e Banco de Dados
+- **ORM**: Prisma (`@prisma/client`)
+- **Banco de Dados**: PostgreSQL
+- **Geração de PDF**: `pdf-lib` para geração automática de relatórios de simulação.
+- **Estilo**: TailwindCSS unificado com as cores da CIFRA.
+
+## Desenvolvimento Local
+Para rodar a calculadora junto com o site de forma integrada, utilize o script na raiz do repositório:
 ```bash
-npm install
-npm run dev
+# Na pasta raiz do monorepo
+.\scripts\start-integrated.ps1 -AdminUser "seu_usuario" -AdminPassword (ConvertTo-SecureString "sua_senha" -AsPlainText -Force) -SessionSecret (ConvertTo-SecureString "seu_secret" -AsPlainText -Force)
 ```
 
-Use `.env.example` como referência para criar `.env.local`. Variáveis com o prefixo `NEXT_PUBLIC_` ficam expostas no bundle; nunca inclua tokens, credenciais ou chaves privadas nelas.
-
-## WhatsApp
-
-Defina `NEXT_PUBLIC_WHATSAPP_NUMBER` no formato internacional, somente com dígitos (`55` + DDD + número). O valor padrão é deliberadamente inválido e não deve chegar a produção.
-
-## Tagflow
-
-A CIFRA envia eventos públicos e anonimizados somente ao Tagflow. GA4, Google Ads, Meta Pixel e Meta CAPI devem ser configurados e encaminhados pelo Tagflow/Cloudflare Worker, nunca diretamente neste frontend.
-
-```env
-NEXT_PUBLIC_TAGFLOW_ENABLED=true
-NEXT_PUBLIC_TAGFLOW_ENDPOINT=https://SEU-ENDPOINT-TAGFLOW/events
-NEXT_PUBLIC_TAGFLOW_SITE_ID=cifra
-NEXT_PUBLIC_TAGFLOW_DEBUG=false
-```
-
-- `NEXT_PUBLIC_TAGFLOW_ENDPOINT`: endpoint público de ingestão, sem token ou query string.
-- `NEXT_PUBLIC_TAGFLOW_SITE_ID`: deve ser `cifra`.
-- `NEXT_PUBLIC_TAGFLOW_DEBUG`: habilita logs sem dados pessoais apenas no navegador de desenvolvimento.
-
-Eventos: `page_view`, `view_form`, `form_start`, `form_submit`, `request_quote`, `lead`, `click_whatsapp`, `whatsapp_redirect`, `click_phone`, `click_email`, `click_facebook` e `cookie_consent_update`.
-
-Todos recebem contexto de página, origem, dispositivo, consentimento, identificadores anônimos e UTMs disponíveis. O formulário envia somente classificações da obra; nome, telefone, e-mail, cidade, observações e valores não entram nos eventos.
-
-## Validação do Tagflow
-
-1. Use um endpoint de homologação e habilite `NEXT_PUBLIC_TAGFLOW_DEBUG=true`.
-2. Abra o site com `?utm_source=teste&utm_medium=qa&utm_campaign=cifra`.
-3. Teste recusa, somente métricas e aceite completo no banner de cookies.
-4. Confirme no Tagflow o `siteId=cifra`, UTMs, consentimento e um `eventId` único por evento.
-5. Valide `page_view`, formulário e cliques no WhatsApp no armazenamento/relatório do Tagflow.
-6. No GA4 DebugView, confirme o mapeamento feito pelo Tagflow.
-7. No Meta Events Manager, confirme Pixel e CAPI com o mesmo `event_id` para deduplicação.
-
-O endpoint indisponível nunca bloqueia o formulário ou a abertura do WhatsApp. A tabela de evidências fica em `RELATORIO-DE-VALIDACAO.md`.
-
-## Build
-
-```bash
-npm run typecheck
-npm run build
-```
-
-O projeto usa exportação estática. O diretório de saída é `out/`.
+## Diferencial e Slogan
+> *"Reduza o INSS da sua obra com planejamento, segurança e conformidade."*
+Este projeto materializa a entrega de valor da CIFRA, permitindo cálculos rápidos, armazenamento de simulações e, no futuro, captação de leads.

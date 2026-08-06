@@ -78,7 +78,18 @@ function round2(num: number): number {
   return Math.round((num + Number.EPSILON) * 100) / 100;
 }
 
-export function calcularINSS(p: SimulacaoInput): SimulacaoResultado {
+export interface DbParametros {
+  percentualUsinado: number;
+  preMoldadoMenor40: number;
+  preMoldadoMaior40: number;
+}
+
+export interface DbRegras {
+  minPercentDctfwebAte350: number; // usually 0.50
+  minPercentDctfwebMais350: number; // usually 0.70
+}
+
+export function calcularINSS(p: SimulacaoInput, dbParam?: DbParametros, dbRegras?: DbRegras): SimulacaoResultado {
   const hoje = new Date();
 
   const vauManual = p.vauManual ?? 0;
@@ -99,23 +110,17 @@ export function calcularINSS(p: SimulacaoInput): SimulacaoResultado {
   const percEquivDemolicao = PERCENTUAL_EQUIVALENCIA.demolicao ?? 1.0;
   const percEquivPiscina = PERCENTUAL_EQUIVALENCIA.piscina ?? 1.0;
 
-  const areaEquivConstrucao = round2(areaConstrucao * percEquivConstrucao);
-  const areaEquivReforma = round2(areaReforma * percEquivReforma);
-  const areaEquivDemolicao = round2(areaDemolicao * percEquivDemolicao);
-  const areaEquivPiscina = round2(areaPiscina * percEquivPiscina);
+  let areaEquivTotal = 0;
+  areaEquivTotal += round2(areaConstrucao * percEquivConstrucao);
+  areaEquivTotal += round2(areaReforma * percEquivReforma);
+  areaEquivTotal += round2(areaDemolicao * percEquivDemolicao);
+  areaEquivTotal += round2(areaPiscina * percEquivPiscina);
+  const areaEquivalente = round2(areaEquivTotal);
 
-  const areaEquivalente = round2(areaEquivConstrucao + areaEquivReforma + areaEquivDemolicao + areaEquivPiscina);
-
-  // 2. COD (Custo da Obra por Destinação) = Área Equivalente x VAU
-  let codConstrucao = areaEquivConstrucao * vau;
-  const codReforma = areaEquivReforma * vauReforma;
-  const codDemolicao = areaEquivDemolicao * vauDemolicao;
-  const codPiscina = areaEquivPiscina * vauPiscina;
-
-  // Dedução concreto usinado (-5% sobre COD de construção)
-  if (p.concretoUsinado) codConstrucao *= 0.95;
-
-  const codTotal = round2(codConstrucao + codReforma + codDemolicao + codPiscina);
+  // 2. COD - Custo da Obra por Destinação (-5% se uso de concreto usinado)
+  const percentualUsinado = dbParam ? dbParam.percentualUsinado : 0.05;
+  const multiplicadorUsinado = p.concretoUsinado ? (1 - percentualUsinado) : 1;
+  const codTotal = round2(areaEquivalente * vau * multiplicadorUsinado);
 
   // 3. Fator Social (apenas Pessoa Física em Obras Prediais)
   const fatorSocial = p.responsavel === "pf" && !isObraNaoPredial(p.tipo) ? getFatorSocial(areaTotal) : 1.0;
@@ -131,7 +136,15 @@ export function calcularINSS(p: SimulacaoInput): SimulacaoResultado {
 
   // 6. Fator de Ajuste (Art. 33 IN 2.021/2021)
   const podeAjuste = p.responsavel === "pf" && !isObraNaoPredial(p.tipo);
-  const minPercentDctfweb = podeAjuste ? getReducaoFatorAjuste(areaTotal) : 0;
+  
+  let minPercentDctfweb = 0;
+  if (podeAjuste) {
+    if (dbRegras) {
+      minPercentDctfweb = areaTotal <= 350 ? dbRegras.minPercentDctfwebAte350 : dbRegras.minPercentDctfwebMais350;
+    } else {
+      minPercentDctfweb = getReducaoFatorAjuste(areaTotal);
+    }
+  }
   const rmtMinimaDctfweb = round2(rmtTotal * minPercentDctfweb);
   
   // INSS no Fator de Ajuste = RMT Mínima x 20% (alíquota patronal)

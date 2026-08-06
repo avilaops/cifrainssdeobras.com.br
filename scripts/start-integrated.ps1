@@ -10,6 +10,7 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $calculator = Join-Path $root "calculadora"
 $website = Join-Path $root "website"
+
 foreach ($port in @($CalculatorPort, $WebsitePort)) {
   if (Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue) {
     throw "A porta $port já está ocupada. Encerre o processo existente antes de iniciar."
@@ -18,19 +19,20 @@ foreach ($port in @($CalculatorPort, $WebsitePort)) {
 
 $passwordText = [System.Net.NetworkCredential]::new("", $AdminPassword).Password
 $secretText = [System.Net.NetworkCredential]::new("", $SessionSecret).Password
+
 try {
-  $env:NEXT_PUBLIC_BASE_PATH = "/calculadora"
+  $env:NEXT_PUBLIC_BASE_PATH = ""
   $env:CALCULADORA_ADMIN_USER = $AdminUser
   $env:CALCULADORA_ADMIN_PASSWORD = $passwordText
   $env:CALCULADORA_SESSION_SECRET = $secretText
   $calcProcess = Start-Process npm.cmd -ArgumentList "run", "dev", "--", "--port", $CalculatorPort -WorkingDirectory $calculator -WindowStyle Hidden -PassThru
-  $env:CALCULADORA_PROXY_URL = "http://127.0.0.1:$CalculatorPort"
-  $env:NEXT_PUBLIC_CALCULADORA_URL = "/calculadora"
+
+  $env:NEXT_PUBLIC_CALCULADORA_URL = "http://localhost:$CalculatorPort"
   $webProcess = Start-Process npm.cmd -ArgumentList "run", "dev", "--", "--port", $WebsitePort -WorkingDirectory $website -WindowStyle Hidden -PassThru
+
   Start-Sleep -Seconds 4
-  Write-Output "Calculadora PID: $($calcProcess.Id)"
-  Write-Output "Website PID: $($webProcess.Id)"
-  Write-Output "Aplicação integrada: http://localhost:$WebsitePort/calculadora"
+  Write-Output "Calculadora (app.cifrainssdeobras.com dev) PID: $($calcProcess.Id) em http://localhost:$CalculatorPort"
+  Write-Output "Website (cifrainssdeobras.com.br dev) PID: $($webProcess.Id) em http://localhost:$WebsitePort"
 } finally {
   $passwordText = $null
   $secretText = $null

@@ -5,11 +5,15 @@ import {
   TIPOS_CLIENTE,
   TIPOS_OBRA,
   UFS,
-} from "@/types/lead";
-import { onlyDigits } from "@/lib/utils";
+} from "../types/lead";
+import { onlyDigits } from "./utils";
 
 const obrigatorio = "Campo obrigatório.";
 const selecioneUmaOpcao = "Selecione uma opção.";
+
+export function normalizeTelefone(tel: string): string {
+  return onlyDigits(tel);
+}
 
 /** Aceita "150", "150,5", "1.250,75" ou "1250.75" e exige valor positivo. */
 const numeroPositivo = (value: string) => {
@@ -17,6 +21,44 @@ const numeroPositivo = (value: string) => {
   const parsed = Number(normalized);
   return Number.isFinite(parsed) && parsed > 0;
 };
+
+export const simulacaoSchema = z.object({
+  nomeCliente: z.string().trim().min(2, "Informe o nome do cliente."),
+  telefone: z.string().trim().min(1, obrigatorio),
+  email: z.string().trim().email("Informe um e-mail válido.").or(z.literal("")),
+  responsavel: z.enum(["pf", "pj"], { message: selecioneUmaOpcao }),
+  uf: z.string().trim().transform((val) => val.toUpperCase()),
+  tipo: z.enum([
+    "residencial",
+    "multifamiliar",
+    "comercial",
+    "industrial",
+    "reforma",
+    "demolicao",
+    "piscina",
+    "mista",
+    "pavimentacao",
+    "terraplenagem",
+    "obraArte",
+    "drenagem",
+    "naoPredial",
+  ]),
+  material: z.enum(["alvenaria", "madeira", "mista"]).optional(),
+  preMoldado: z.boolean().optional(),
+  areaConstrucao: z.number().min(0),
+  areaReforma: z.number().min(0).default(0),
+  areaDemolicao: z.number().min(0).default(0),
+  areaPiscina: z.number().min(0).default(0),
+  concretoUsinado: z.boolean().default(false),
+  dataInicio: z.string().min(1),
+  dataFim: z.string().min(1),
+  vauManual: z.number().min(0).optional(),
+  percHonorarios: z.number().min(0).max(1).default(0.3),
+  competenciaVau: z.string().optional(),
+  observacoes: z.string().optional(),
+});
+
+export type SimulacaoSchemaValues = z.infer<typeof simulacaoSchema>;
 
 export const leadFormSchema = z.object({
   nome: z
@@ -60,7 +102,6 @@ export const leadFormSchema = z.object({
   tipoObra: z.enum(TIPOS_OBRA, {
     message: selecioneUmaOpcao,
   }),
-
 
   area: z
     .string()

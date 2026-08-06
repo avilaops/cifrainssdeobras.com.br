@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Oswald } from "next/font/google";
-import { Sidebar } from "@/components/layout/sidebar";
+import { AppSidebar } from "@/components/layout/sidebar";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -17,9 +17,13 @@ const display = Oswald({
 });
 
 export const metadata: Metadata = {
-  title: "Simulador INSS de Obra — CIFRA",
-  description: "Sistema interno de planejamento tributário de obra da CIFRA.",
+  title: "CIFRA — Sistema de Planejamento Tributário",
+  description: "Painel administrativo interno da CIFRA Consultoria Tributária de Obra.",
   robots: { index: false, follow: false },
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -29,10 +33,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${manrope.variable} ${display.variable} h-full antialiased`}>
-      <body className="min-h-full bg-[#f8f9fa] flex">
-        <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <main id="conteudo" className="flex-1 overflow-y-auto">
+      <body className="flex h-full min-h-screen bg-[#f5f5ef]">
+        <AppSidebar />
+        {/* Main content — takes the remaining space, scrollable */}
+        <div className="flex min-w-0 flex-1 flex-col md:h-screen md:overflow-y-auto">
+          <main id="conteudo" className="flex-1">
             {children}
           </main>
         </div>

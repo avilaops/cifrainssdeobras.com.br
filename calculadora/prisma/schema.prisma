@@ -53,28 +53,28 @@ enum TipoAuditoria {
 }
 
 model Cliente {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  nome      String
-  telefone  String?  @unique
-  email     String?  @unique
-  documento String?
-  obras     Obra[]
+  id         String      @id @default(cuid())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  nome       String
+  telefone   String?     @unique
+  email      String?     @unique
+  documento  String?
+  obras      Obra[]
   simulacoes Simulacao[]
 
   @@map("clientes")
 }
 
 model Obra {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  clienteId String
-  cliente   Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
-  nome      String?
-  uf        String
-  tipoObra  TipoObra
+  id         String      @id @default(cuid())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  clienteId  String
+  cliente    Cliente     @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  nome       String?
+  uf         String
+  tipoObra   TipoObra
   dataInicio DateTime
   dataFim    DateTime
   simulacoes Simulacao[]
@@ -88,20 +88,20 @@ model Simulacao {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  clienteId String?
-  cliente   Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
-  obraId    String?
-  obra      Obra?    @relation(fields: [obraId], references: [id], onDelete: SetNull)
-  status    StatusSimulacao @default(SIMULADO)
-  versao    Int @default(1)
+  clienteId        String?
+  cliente          Cliente?        @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  obraId           String?
+  obra             Obra?           @relation(fields: [obraId], references: [id], onDelete: SetNull)
+  status           StatusSimulacao @default(SIMULADO)
+  versao           Int             @default(1)
   versaoAnteriorId String?
-  versaoAnterior Simulacao? @relation("VersoesSimulacao", fields: [versaoAnteriorId], references: [id], onDelete: SetNull)
-  revisoes Simulacao[] @relation("VersoesSimulacao")
-  versaoCalculo String @default("2026.07")
-  fonteParametros String @default("IN RFB 2.021/2021 e Manual SERO")
-  competenciaVau String?
-  observacoes String?
-  criadoPor String @default("sistema")
+  versaoAnterior   Simulacao?      @relation("VersoesSimulacao", fields: [versaoAnteriorId], references: [id], onDelete: SetNull)
+  revisoes         Simulacao[]     @relation("VersoesSimulacao")
+  versaoCalculo    String          @default("2026.07")
+  fonteParametros  String          @default("IN RFB 2.021/2021 e Manual SERO")
+  competenciaVau   String?
+  observacoes      String?
+  criadoPor        String          @default("sistema")
 
   // Contato
   nomeCliente String
@@ -113,16 +113,16 @@ model Simulacao {
   uf              String
   tipoObra        TipoObra
   material        MaterialObra @default(ALVENARIA)
-  preMoldado      Boolean @default(false)
-  areaConstrucao  Float   @default(0)
-  areaReforma     Float   @default(0)
-  areaDemolicao   Float   @default(0)
-  areaPiscina     Float   @default(0)
-  concretoUsinado Boolean @default(false)
+  preMoldado      Boolean      @default(false)
+  areaConstrucao  Float        @default(0)
+  areaReforma     Float        @default(0)
+  areaDemolicao   Float        @default(0)
+  areaPiscina     Float        @default(0)
+  concretoUsinado Boolean      @default(false)
   dataInicio      DateTime
   dataFim         DateTime
   vauManual       Float?
-  percHonorarios  Float   @default(0.30)
+  percHonorarios  Float        @default(0.30)
 
   // Resultado (congelado no momento do calculo)
   vauUsado        Float
@@ -157,13 +157,13 @@ model Simulacao {
 }
 
 model Auditoria {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  simulacaoId  String?
-  simulacao    Simulacao?    @relation(fields: [simulacaoId], references: [id], onDelete: SetNull)
-  tipo         TipoAuditoria
-  usuario      String
-  detalhes     String?
+  id          String        @id @default(cuid())
+  createdAt   DateTime      @default(now())
+  simulacaoId String?
+  simulacao   Simulacao?    @relation(fields: [simulacaoId], references: [id], onDelete: SetNull)
+  tipo        TipoAuditoria
+  usuario     String
+  detalhes    String?
 
   @@index([simulacaoId])
   @@index([createdAt])
@@ -175,9 +175,56 @@ model VAUMensal {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   uf          String
-  competencia String   // Ex: "08/2026"
+  competencia String // Ex: "08/2026"
   valorBase   Float
 
   @@unique([uf, competencia])
   @@map("vau_mensal")
+}
+
+model TabelaINSS {
+  id          String   @id @default(cuid())
+  competencia String   // Ex: "2026"
+  limite      Float
+  aliquota    Float
+  deducao     Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tabela_inss")
+}
+
+model TabelaIRPF {
+  id          String   @id @default(cuid())
+  competencia String   // Ex: "2026"
+  limite      Float
+  aliquota    Float
+  deducao     Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tabela_irpf")
+}
+
+model ParametrosImpostos {
+  id                String   @id @default(cuid())
+  competencia       String   @unique // Ex: "2026"
+  percentualUsinado Float
+  preMoldadoMenor40 Float
+  preMoldadoMaior40 Float
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("parametros_impostos")
+}
+
+model RegraReducaoIRPF {
+  id                String   @id @default(cuid())
+  competencia       String   // Ex: "2026"
+  minPercentDctfweb Float
+  reducaoPercent    Float
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("regra_reducao_irpf")
 }
