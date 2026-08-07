@@ -174,7 +174,7 @@ export function calcularINSS(p: SimulacaoInput, dbParam?: DbParametros, dbRegras
   // 8. Economia Gerada (O custo total com planejamento é INSS + MAED)
   const economiaImposto = round2(inssDevido - (inssComReducao + multaMaed));
   const reducaoPercent = inssDevido > 0 ? (economiaImposto / inssDevido) * 100 : 0;
-  const honorarios = round2(economiaImposto * (p.percHonorarios || 0.30));
+  const honorarios = round2(economiaImposto * (p.percHonorarios ?? 0.30));
   const economiaLiq = round2(economiaImposto - honorarios);
 
   return {

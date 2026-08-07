@@ -24,7 +24,7 @@ const NAV_MODULES: NavModule[] = [
     items: [
       { label: "Planejamento Tributário", href: "/em-breve/planejamento-tributario" },
       { label: "Fator de Ajuste",         href: "/em-breve/fator-ajuste" },
-      { label: "Planejador DCTFWeb",      href: "/simulador-obra-predial", available: true },
+      { label: "Planejador DCTFWeb",      href: "/em-breve/planejador-dctfweb" },
     ],
   },
   {

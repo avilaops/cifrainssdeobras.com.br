@@ -25,11 +25,15 @@ const tipoLabel: Record<string, string> = {
 };
 
 function data(d: Date) {
-  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(d);
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeZone: "UTC" }).format(d);
 }
 
 function dataHora(d: Date) {
   return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(d);
+}
+
+function mesesEntre(d1: Date, d2: Date) {
+  return (d2.getUTCFullYear() - d1.getUTCFullYear()) * 12 + (d2.getUTCMonth() - d1.getUTCMonth());
 }
 
 function Row({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
@@ -163,7 +167,7 @@ export default async function SimulacaoRelatorioPage({
                   <Row label="INSS devido" value={brl(s.inssDevido)} strong />
                   <Row label="Fator de ajuste" value={s.podeFatorAjuste ? `Aplicável (${num(s.reducaoPercent, 1)}%)` : "Não aplicável"} />
                   <Row label="INSS com planejamento" value={brl(s.inssComReducao)} strong />
-                  {Math.max(0, (s.dataInicio.getTime() ? (s.createdAt.getFullYear() - s.dataInicio.getFullYear()) * 12 + (s.createdAt.getMonth() - s.dataInicio.getMonth()) : 0)) > 0 && s.podeFatorAjuste && <Row label="Multa MAED (Atraso DCTFWeb)" value={brl(Math.max(0, (s.createdAt.getFullYear() - s.dataInicio.getFullYear()) * 12 + (s.createdAt.getMonth() - s.dataInicio.getMonth())) * 100)} />}
+                  {Math.max(0, mesesEntre(s.dataInicio, s.createdAt)) > 0 && s.podeFatorAjuste && <Row label="Multa MAED (Atraso DCTFWeb)" value={brl(Math.max(0, mesesEntre(s.dataInicio, s.createdAt)) * 100)} />}
                 </tbody>
               </table>
             </div>

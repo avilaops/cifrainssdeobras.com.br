@@ -24,7 +24,7 @@ const numeroPositivo = (value: string) => {
 
 export const simulacaoSchema = z.object({
   nomeCliente: z.string().trim().min(2, "Informe o nome do cliente."),
-  telefone: z.string().trim().min(1, obrigatorio),
+  telefone: z.string().trim().optional().default(""),
   email: z.string().trim().email("Informe um e-mail válido.").or(z.literal("")),
   responsavel: z.enum(["pf", "pj"], { message: selecioneUmaOpcao }),
   uf: z.string().trim().transform((val) => val.toUpperCase()),
@@ -43,7 +43,7 @@ export const simulacaoSchema = z.object({
     "drenagem",
     "naoPredial",
   ]),
-  material: z.enum(["alvenaria", "madeira", "mista"]).optional(),
+  material: z.enum(["ALVENARIA", "MADEIRA", "MISTA"]).optional(),
   preMoldado: z.boolean().optional(),
   areaConstrucao: z.number().min(0),
   areaReforma: z.number().min(0).default(0),

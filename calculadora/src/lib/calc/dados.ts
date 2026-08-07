@@ -120,7 +120,7 @@ export function getReducaoFatorAjuste(areaTotalM2: number): number {
 export function mesesEntreDatasRaw(dataInicio: string | Date, dataFim: string | Date): number {
   const d1 = new Date(dataInicio);
   const d2 = new Date(dataFim);
-  return (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+  return (d2.getUTCFullYear() - d1.getUTCFullYear()) * 12 + (d2.getUTCMonth() - d1.getUTCMonth());
 }
 
 export function mesesEntreDatas(dataInicio: string | Date, dataFim: string | Date): number {

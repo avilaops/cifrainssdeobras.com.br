@@ -221,7 +221,7 @@ export function SimulatorShell({ children }: { children: React.ReactNode }) {
       setResultado(res);
     } catch (err) {
       console.error(err);
-      setSalvarErro("Erro ao calcular. Verifique se as configurações de impostos existem.");
+      setSalvarErro("Erro ao calcular a simulação. Verifique os dados informados e tente novamente.");
     } finally {
       setCalculando(false);
     }

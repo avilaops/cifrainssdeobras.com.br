@@ -65,6 +65,12 @@ export function SummaryPanel() {
               Complete as 5 etapas e clique em<br />
               <strong>Calcular simulação</strong> na última etapa.
             </p>
+
+            {salvarErro && (
+              <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">
+                {salvarErro}
+              </p>
+            )}
           </div>
         )}
 

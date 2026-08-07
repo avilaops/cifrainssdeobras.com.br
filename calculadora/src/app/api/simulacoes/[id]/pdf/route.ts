@@ -5,6 +5,11 @@ import { prisma } from "@/lib/prisma";
 
 const money = (value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 const date = (value: Date) => new Intl.DateTimeFormat("pt-BR").format(value);
+// dataInicio/dataFim são datas-calendário puras salvas como meia-noite UTC; formatar em UTC evita
+// que o fuso do servidor (ex.: America/Sao_Paulo) as exiba um dia antes.
+const dateUTC = (value: Date) => new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(value);
+const mesesEntreUTC = (d1: Date, d2: Date) =>
+  (d2.getUTCFullYear() - d1.getUTCFullYear()) * 12 + (d2.getUTCMonth() - d1.getUTCMonth());
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -65,7 +70,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     page.drawText(`${s.areaConstrucao.toFixed(2)} m²`, { x: 140, y, size: 10, font: regular, color: pine });
     y -= 15;
     page.drawText("PERÍODO DE OBRA:", { x: 50, y, size: 10, font: bold, color: pine });
-    page.drawText(`${date(s.dataInicio)} À ${date(s.dataFim)}`, { x: 160, y, size: 10, font: regular, color: pine });
+    page.drawText(`${dateUTC(s.dataInicio)} À ${dateUTC(s.dataFim)}`, { x: 160, y, size: 10, font: regular, color: pine });
     y -= 15;
     page.drawText("CLIENTE:", { x: 50, y, size: 10, font: bold, color: pine });
     page.drawText(s.nomeCliente || "Não informado", { x: 140, y, size: 10, font: regular, color: pine });
@@ -198,7 +203,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     line("Cliente", s.nomeCliente, true); 
     line("Contato", [s.telefone, s.email].filter(Boolean).join(" | ") || "Não informado");
     line("Obra", `${s.tipoObra} - ${s.uf} - ${s.responsavel}`); 
-    line("Período", `${date(s.dataInicio)} a ${date(s.dataFim)}`);
+    line("Período", `${dateUTC(s.dataInicio)} a ${dateUTC(s.dataFim)}`);
     
     section("Dados utilizados no cálculo");
     line("Área de construção", `${s.areaConstrucao.toFixed(2)} m2`); 
@@ -214,7 +219,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     line("INSS estimado sem planejamento", money(s.inssDevido), true); 
     line("INSS estimado após planejamento", money(s.inssComReducao), true);
     
-    const mesesRetro = Math.max(0, (s.createdAt.getFullYear() - s.dataInicio.getFullYear()) * 12 + (s.createdAt.getMonth() - s.dataInicio.getMonth()));
+    const mesesRetro = Math.max(0, mesesEntreUTC(s.dataInicio, s.createdAt));
     const multaMaed = s.podeFatorAjuste ? mesesRetro * 100 : 0;
     if (multaMaed > 0) {
       line("Multa MAED (Atraso DCTFWeb)", money(multaMaed));

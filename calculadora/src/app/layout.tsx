@@ -32,7 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${manrope.variable} ${display.variable} h-full antialiased`}>
+    <html
+      lang="pt-BR"
+      className={`${manrope.variable} ${display.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+    >
       <body className="flex h-full min-h-screen bg-[#f5f5ef]">
         <AppSidebar />
         {/* Main content — takes the remaining space, scrollable */}

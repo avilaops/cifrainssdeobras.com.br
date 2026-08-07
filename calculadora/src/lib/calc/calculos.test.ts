@@ -27,7 +27,10 @@ describe("motor de cálculo (IN RFB 2.021/2021)", () => {
     expect(res.inssDevido).toBeCloseTo(9994.85, 1);
     expect(res.rmtMinimaDctfweb).toBeCloseTo(13579.96, 1);
     expect(res.inssComReducao).toBeCloseTo(2715.99, 1);
-    expect(res.economiaImposto).toBeCloseTo(7178.86, 1);
+    // Obra iniciada no mês corrente: 0 meses retroativos, sem Multa MAED.
+    expect(res.mesesRetro).toBe(0);
+    expect(res.multaMaed).toBe(0);
+    expect(res.economiaImposto).toBeCloseTo(7278.86, 1);
   });
 
   it("não aplica fator social nem ajuste em obra não predial", () => {
