@@ -3,6 +3,7 @@ import { ArrowRight, Check, Percent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/motion/reveal";
 import { HeroSimulator } from "@/components/sections/hero-simulator";
+import { siteConfig } from "@/config/site";
 
 const trustIndicators = [
   "Atendimento especializado",
@@ -49,7 +50,9 @@ export function Hero() {
                 </Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
-                <Link href="/#como-funciona">Entender como funciona</Link>
+                <Link href={siteConfig.calculatorUrl || "/#economia"}>
+                  Abrir calculadora
+                </Link>
               </Button>
             </div>
 

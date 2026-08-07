@@ -10,6 +10,7 @@ export const siteConfig = {
     "Consultoria especializada em INSS de obra, CNO, SERO, aferição e regularização tributária de obras em todo o Brasil.",
   url: "https://cifrainssdeobras.com.br",
   domain: "cifrainssdeobras.com.br",
+  calculatorUrl: process.env.NEXT_PUBLIC_CALCULADORA_URL || "https://app.cifrainssdeobras.com",
 
   seo: {
     title: "CIFRA | Consultoria de INSS de Obra e Regularização",
@@ -36,17 +37,18 @@ export const siteConfig = {
    * Enquanto vazios, nada é exibido nem incluído no Schema.org.
    */
   company: {
-    cnpj: "", // ex.: "00.000.000/0001-00"
-    address: "", // endereço físico, se houver
-    phone: "", // telefone fixo exibível, se houver
+    cnpj: "", // Será preenchido quando o CNPJ for emitido
+    address: "Rua Oscar Adami Sobrinho, 4464, Votuporanga - SP",
+    phone: "+55 17 99743-2052", 
   },
 
   nav: [
     { label: "Início", href: "/" },
     { label: "Sobre", href: "/sobre/" },
     { label: "Serviços", href: "/servicos/" },
+    { label: "Calculadora", href: process.env.NEXT_PUBLIC_CALCULADORA_URL || "https://app.cifrainssdeobras.com" },
     { label: "Como funciona", href: "/#como-funciona" },
-    { label: "Para quem é", href: "/#para-quem" },
+    { label: "Parceiros", href: "/parceiros/" },
     { label: "Dúvidas", href: "/#duvidas" },
     { label: "Contato", href: "/contato/" },
   ],

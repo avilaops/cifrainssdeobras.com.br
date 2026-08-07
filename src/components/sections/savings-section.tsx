@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
+import { siteConfig } from "@/config/site";
 
 /**
  * Seção de economia com calculadora apenas demonstrativa: nenhum valor é
@@ -143,10 +144,17 @@ export function SavingsSection() {
               </div>
             </div>
 
-            <Button type="submit" size="lg" className="mt-6 w-full">
-              Solicitar análise
-              <ArrowRight aria-hidden="true" />
-            </Button>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <Button type="submit" size="lg" className="w-full">
+                Solicitar análise
+                <ArrowRight aria-hidden="true" />
+              </Button>
+              {siteConfig.calculatorUrl ? (
+                <Button asChild type="button" variant="secondary" size="lg" className="w-full">
+                  <a href={siteConfig.calculatorUrl}>Abrir calculadora</a>
+                </Button>
+              ) : null}
+            </div>
             <p className="mt-3 text-center text-xs text-graphite-400">
               Sem compromisso. Seus dados seguem para o formulário de análise.
             </p>

@@ -3,13 +3,9 @@ import { faqItems } from "@/config/faq";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Hero } from "@/components/sections/hero";
 import { TrustBar } from "@/components/sections/trust-bar";
-import { AboutSection } from "@/components/sections/about-section";
 import { ProblemsSection } from "@/components/sections/problems-section";
 import { ServicesGrid } from "@/components/sections/services-grid";
 import { ProcessTimeline } from "@/components/sections/process-timeline";
-import { SavingsSection } from "@/components/sections/savings-section";
-import { AudienceSection } from "@/components/sections/audience-section";
-import { BenefitsSection } from "@/components/sections/benefits-section";
 import { LeadFormSection } from "@/components/sections/lead-form-section";
 import { MidCta } from "@/components/sections/mid-cta";
 import { Testimonials } from "@/components/sections/testimonials";
@@ -42,6 +38,11 @@ const faqJsonLd = {
   })),
 };
 
+/**
+ * Home enxuta e focada em conversão: o simulador do hero alimenta o
+ * formulário principal. Conteúdo institucional completo vive em /sobre,
+ * /servicos e /parceiros.
+ */
 export default function HomePage() {
   return (
     <>
@@ -50,13 +51,9 @@ export default function HomePage() {
 
       <Hero />
       <TrustBar />
-      <AboutSection />
       <ProblemsSection />
       <ServicesGrid />
       <ProcessTimeline />
-      <SavingsSection />
-      <AudienceSection />
-      <BenefitsSection />
       <LeadFormSection />
       <MidCta />
       <Testimonials />

@@ -1,0 +1,3 @@
+# Cloudflare Pages / Netlify proxy mapping
+# Substitua pela URL de producao da calculadora
+/calculadora/* https://sua-calculadora-hospedada.com/:splat 200
