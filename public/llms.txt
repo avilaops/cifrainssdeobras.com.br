@@ -1,0 +1,29 @@
+# CIFRA — Consultoria Tributária de Obra
+
+> Consultoria especializada em INSS de obra, CNO, SERO, aferição e regularização tributária de obras em todo o Brasil.
+
+Canonical site: https://cifrainssdeobras.com.br
+
+## Páginas principais
+
+- [Página Inicial](https://cifrainssdeobras.com.br/): apresentação da CIFRA, calculadora de INSS e como funciona o processo.
+- [Sobre](https://cifrainssdeobras.com.br/sobre/): informações institucionais sobre a empresa.
+- [Serviços](https://cifrainssdeobras.com.br/servicos/): lista completa de serviços oferecidos.
+- [Contato](https://cifrainssdeobras.com.br/contato/): canais de atendimento e formulário de contato.
+- [Parceiros](https://cifrainssdeobras.com.br/parceiros/): rede de parceiros da CIFRA.
+- [Procuração Eletrônica](https://cifrainssdeobras.com.br/procuracao-eletronica/): como emitir procuração eletrônica para representação junto à Receita Federal.
+- [Calculadora de INSS](https://app.cifrainssdeobras.com): ferramenta para simular o custo de INSS da sua obra.
+- [Sitemap XML](https://cifrainssdeobras.com.br/sitemap.xml): lista canônica de URLs públicas.
+
+## Serviços detalhados
+
+- [INSS de Obra](https://cifrainssdeobras.com.br/servicos/inss-de-obra/): consultoria para cálculo, redução e regularização do INSS sobre obras de construção civil.
+- [CNO — Cadastro Nacional de Obras](https://cifrainssdeobras.com.br/servicos/cno/): abertura, regularização e encerramento do CNO junto à Receita Federal.
+- [SERO — Sistema Eletrônico de Regularização de Obras](https://cifrainssdeobras.com.br/servicos/sero/): aferição e regularização via sistema eletrônico da Receita Federal.
+- [Aferição de Obra](https://cifrainssdeobras.com.br/servicos/afericao-de-obra/): cálculo da contribuição previdenciária com base na aferição indireta.
+- [Planejamento Tributário](https://cifrainssdeobras.com.br/servicos/planejamento-tributario/): estratégias para reduzir legalmente a carga tributária em obras.
+
+## Informações legais
+
+- [Política de Privacidade](https://cifrainssdeobras.com.br/politica-de-privacidade/)
+- [Termos de Uso](https://cifrainssdeobras.com.br/termos-de-uso/)
