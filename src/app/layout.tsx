@@ -8,6 +8,7 @@ import { FloatingWhatsApp } from "@/components/layout/floating-whatsapp";
 import { CookieConsent } from "@/components/layout/cookie-consent";
 import { TagflowTracker } from "@/components/tagflow/tagflow-tracker";
 import { AnalyticsGtm } from "@/components/analytics/google-tag-manager";
+import { AnalyticsMetaPixel } from "@/components/analytics/meta-pixel";
 import { JsonLd } from "@/components/seo/json-ld";
 import "./globals.css";
 
@@ -111,6 +112,7 @@ export default function RootLayout({
     <html lang="pt-BR" className={`${manrope.variable} ${display.variable}`}>
       <body>
         <AnalyticsGtm />
+        <AnalyticsMetaPixel />
         <JsonLd data={organizationJsonLd} />
         <JsonLd data={websiteJsonLd} />
 
