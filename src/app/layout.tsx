@@ -51,18 +51,20 @@ export const metadata: Metadata = {
     description: siteConfig.seo.description,
     images: [
       {
-        url: "/images/logo-cifra.jpg",
-        width: 1246,
-        height: 1246,
+        // Card 1200x630. O logo quadrado que estava aqui era recortado pelo
+        // formato 1.91:1 do preview.
+        url: "/og-default.png",
+        width: 1200,
+        height: 630,
         alt: "CIFRA — Consultoria Tributária de Obra",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: siteConfig.seo.title,
     description: siteConfig.seo.description,
-    images: ["/images/logo-cifra.jpg"],
+    images: ["/og-default.png"],
   },
   robots: {
     index: true,
