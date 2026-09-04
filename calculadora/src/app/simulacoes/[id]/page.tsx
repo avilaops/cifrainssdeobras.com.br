@@ -72,7 +72,7 @@ export default async function SimulacaoRelatorioPage({
             <ArrowLeft className="size-4" />
             Voltar para simulações
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Link href={`/simulacoes/${id}/editar`} className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-bold text-graphite-900"><Pencil className="size-4"/> Revisar</Link>
             <PdfButton id={id} />
             <PrintButton />
@@ -119,7 +119,7 @@ export default async function SimulacaoRelatorioPage({
             </div>
           </section>
 
-          <section className="mb-6 grid gap-4 sm:grid-cols-2 print:hidden">
+          <section className="mb-6 grid min-w-0 gap-4 sm:grid-cols-2 print:hidden">
             <div className="rounded-lg border border-graphite-100 p-4">
               <p className="mb-2 text-xs font-bold tracking-wide text-graphite-500 uppercase">Andamento</p>
               <StatusSelect id={s.id} status={s.status} />

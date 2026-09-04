@@ -46,7 +46,9 @@ export default function RootLayout({
       className={`${manrope.variable} ${display.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
     >
-      <body className="flex h-full min-h-screen bg-[#f5f5ef]">
+      {/* No celular a barra do menu fica em cima e o conteúdo embaixo (coluna).
+          Com flex em linha, a barra virava uma coluna vazia de 40% à esquerda. */}
+      <body className="flex min-h-screen flex-col bg-[#f5f5ef] md:h-full md:flex-row">
         <AppSidebar />
         {/* Main content — takes the remaining space, scrollable */}
         <div className="flex min-w-0 flex-1 flex-col md:h-screen md:overflow-y-auto">

@@ -121,7 +121,7 @@ export default async function SimulacoesPage({
                     <p className="font-bold text-pine-900">{m.nomeCliente}</p>
                     <p className="text-xs text-graphite-500">{m.telefone || "Sem telefone"}</p>
                     <p className={`mt-2 text-xs font-bold ${isAtrasado ? "text-red-600" : "text-pine-600"}`}>
-                      {isAtrasado ? "Atrasado desde" : "Agendado para"}: {dataCurta(alerta).split(" ")[0]}
+                      {isAtrasado ? "Atrasado desde" : "Agendado para"}: {dataCurta(alerta).split(",")[0]}
                     </p>
                   </Link>
                 );
@@ -131,47 +131,47 @@ export default async function SimulacoesPage({
         )}
 
         <form className="mb-4 grid gap-3 rounded-xl border border-graphite-200 bg-white/70 p-4 sm:grid-cols-2 lg:grid-cols-4">
-          <label className="flex flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">
+          <label className="flex min-w-0 flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">
             Buscar
             <input
               name="q"
               defaultValue={q}
               placeholder="Cliente, telefone ou e-mail"
-              className="rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900 outline-none focus:border-olive-400"
+              className="w-full min-w-0 rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900 outline-none focus:border-olive-400"
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">Status
-            <select name="status" defaultValue={status ?? ""} className="rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900">
+          <label className="flex min-w-0 flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">Status
+            <select name="status" defaultValue={status ?? ""} className="w-full min-w-0 rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900">
               <option value="">Todos</option>{Object.entries(STATUS_LABELS).map(([v,l]) => <option key={v} value={v}>{l}</option>)}
             </select>
           </label>
-          <label className="flex flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">Tipo
-            <select name="tipo" defaultValue={tipo ?? ""} className="rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900">
+          <label className="flex min-w-0 flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">Tipo
+            <select name="tipo" defaultValue={tipo ?? ""} className="w-full min-w-0 rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900">
               <option value="">Todos</option>{Object.entries(tipoLabel).map(([v,l]) => <option key={v} value={v}>{l}</option>)}
             </select>
           </label>
-          <label className="flex flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">De
-            <input type="date" name="de" defaultValue={params.de ?? ""} className="rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm text-graphite-900" />
+          <label className="flex min-w-0 flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">De
+            <input type="date" name="de" defaultValue={params.de ?? ""} className="w-full min-w-0 rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm text-graphite-900" />
           </label>
-          <label className="flex flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">Até
-            <input type="date" name="ate" defaultValue={params.ate ?? ""} className="rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm text-graphite-900" />
+          <label className="flex min-w-0 flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">Até
+            <input type="date" name="ate" defaultValue={params.ate ?? ""} className="w-full min-w-0 rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm text-graphite-900" />
           </label>
-          <label className="flex flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">
+          <label className="flex min-w-0 flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">
             UF
             <input
               name="uf"
               defaultValue={uf}
               maxLength={2}
               placeholder="SP"
-              className="rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900 uppercase outline-none focus:border-olive-400"
+              className="w-full min-w-0 rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900 uppercase outline-none focus:border-olive-400"
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">
+          <label className="flex min-w-0 flex-col gap-1 text-xs font-bold tracking-wide text-graphite-500 uppercase">
             Responsável
             <select
               name="responsavel"
               defaultValue={responsavel}
-              className="rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900 outline-none focus:border-olive-400"
+              className="w-full min-w-0 rounded-lg border border-graphite-200 bg-white px-3 py-2 text-sm font-medium text-graphite-900 outline-none focus:border-olive-400"
             >
               <option value="">Todos</option>
               <option value="PF">PF</option>
@@ -195,19 +195,19 @@ export default async function SimulacoesPage({
         <section className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-xl border border-graphite-200 bg-white/70 p-4">
             <p className="text-[10px] font-bold tracking-wide text-graphite-500 uppercase">Registros</p>
-            <p className="mt-1 text-xl font-black">{total}</p>
+            <p className="mt-1 break-words text-lg font-black tabular-nums sm:text-xl">{total}</p>
           </div>
           <div className="rounded-xl border border-graphite-200 bg-white/70 p-4">
             <p className="text-[10px] font-bold tracking-wide text-graphite-500 uppercase">INSS devido</p>
-            <p className="mt-1 text-xl font-black">{brl(totais._sum.inssDevido ?? 0)}</p>
+            <p className="mt-1 break-words text-lg font-black tabular-nums sm:text-xl">{brl(totais._sum.inssDevido ?? 0)}</p>
           </div>
           <div className="rounded-xl border border-graphite-200 bg-white/70 p-4">
             <p className="text-[10px] font-bold tracking-wide text-graphite-500 uppercase">Economia líquida</p>
-            <p className="mt-1 text-xl font-black text-pine-600">{brl(totais._sum.economiaLiquida ?? 0)}</p>
+            <p className="mt-1 break-words text-lg font-black tabular-nums text-pine-600 sm:text-xl">{brl(totais._sum.economiaLiquida ?? 0)}</p>
           </div>
           <div className="rounded-xl border border-graphite-200 bg-white/70 p-4">
             <p className="text-[10px] font-bold tracking-wide text-graphite-500 uppercase">Honorários</p>
-            <p className="mt-1 text-xl font-black text-gold">{brl(totais._sum.honorarios ?? 0)}</p>
+            <p className="mt-1 break-words text-lg font-black tabular-nums text-gold sm:text-xl">{brl(totais._sum.honorarios ?? 0)}</p>
           </div>
         </section>
 
@@ -234,7 +234,7 @@ export default async function SimulacoesPage({
                       </p>
                       <p className="text-xs text-graphite-500">{tipoLabel[s.tipoObra] ?? s.tipoObra}</p>
                     </div>
-                    <p className="shrink-0 text-[11px] text-graphite-500">{dataCurta(s.createdAt).split(" ")[0]}</p>
+                    <p className="shrink-0 text-[11px] text-graphite-500">{dataCurta(s.createdAt).split(",")[0]}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="rounded-lg bg-graphite-100 px-3 py-2">
