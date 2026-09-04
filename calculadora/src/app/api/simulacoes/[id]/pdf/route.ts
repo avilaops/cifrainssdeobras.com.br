@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, type RGB } from "pdf-lib";
 import { TipoAuditoria } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
@@ -82,7 +82,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     
     y -= 35;
     // Tabela 1 Linhas
-    const drawRow = (label: string, val: string, bg: any, textCol: any = pine) => {
+    const drawRow = (label: string, val: string, bg: RGB, textCol: RGB = pine) => {
       page.drawRectangle({ x: 50, y: y - 12, width: 495, height: 18, color: bg });
       page.drawLine({ start: { x: 50, y: y - 12 }, end: { x: 545, y: y - 12 }, color: gray, thickness: 0.5 });
       page.drawText(label, { x: 55, y: y - 7, size: 9, font: bold, color: textCol });
@@ -104,7 +104,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     y -= 35;
     
     // Tabela Valores Linhas
-    const drawDoubleRow = (l1: string, v1: string, v2: string, bg: any, isBold = false) => {
+    const drawDoubleRow = (l1: string, v1: string, v2: string, bg: RGB, isBold = false) => {
       page.drawRectangle({ x: 50, y: y - 12, width: 247, height: 18, color: bg });
       page.drawRectangle({ x: 297, y: y - 12, width: 248, height: 18, color: bg });
       page.drawText(l1, { x: 55, y: y - 7, size: 9, font: isBold ? bold : regular, color: pine });
@@ -160,7 +160,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     });
 
     y -= 20;
-    let dataValidade = new Date();
+    const dataValidade = new Date();
     dataValidade.setDate(dataValidade.getDate() + 30);
     page.drawText("Esta Simulação é baseada nas informações iniciais do contratante e os valores são aproximados.", { x: 50, y, size: 8, font: regular, color: gray });
     y -= 15;

@@ -3,29 +3,37 @@
 import * as React from "react";
 import Link from "next/link";
 import {
+  CONSENT_CHANGE_EVENT,
   getStoredConsent,
   storeConsent,
 } from "@/lib/tagflow";
 import { Button } from "@/components/ui/button";
+
+// O localStorage é a fonte externa: no servidor o banner não existe (snapshot
+// false), no cliente ele aparece só enquanto não há escolha gravada.
+function subscribe(onChange: () => void) {
+  window.addEventListener(CONSENT_CHANGE_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(CONSENT_CHANGE_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+const semEscolha = () => getStoredConsent() === null;
+const noServidor = () => false;
 
 /**
  * Banner de consentimento (LGPD). A escolha define quais encaminhamentos o
  * Tagflow poderá realizar; nenhuma tag de terceiro é carregada diretamente.
  */
 export function CookieConsent() {
-  const [visible, setVisible] = React.useState(false);
-
-  // Decide após a montagem para não divergir do HTML gerado no build.
-  React.useEffect(() => {
-    setVisible(getStoredConsent() === null);
-  }, []);
+  const visible = React.useSyncExternalStore(subscribe, semEscolha, noServidor);
 
   if (!visible) return null;
 
+  // storeConsent dispara CONSENT_CHANGE_EVENT, que esconde o banner.
   const choose = (analytics: boolean, marketing: boolean) => {
-    const status = { analytics, marketing };
-    storeConsent(status);
-    setVisible(false);
+    storeConsent({ analytics, marketing });
   };
 
   return (

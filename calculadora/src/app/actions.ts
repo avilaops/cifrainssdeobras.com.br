@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { Prisma, StatusSimulacao, TipoAuditoria, TipoObra } from "@prisma/client";
+import { Prisma, StatusSimulacao, TipoAuditoria, TipoObra, type MaterialObra, type TipoObraVau } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { calcularINSS, type SimulacaoInput } from "@/lib/calc/calculos";
 import { TIPO_OBRA_VAU, MULT_TIPO, type TipoObraKey } from "@/lib/calc/dados";
@@ -149,9 +149,9 @@ export async function salvarSimulacao(input: SalvarSimulacaoInput) {
       const tipoObraVau = TIPO_OBRA_VAU[parsed.tipo];
       if (parsed.vauManual && parsed.vauManual > 0 && parsed.competenciaVau && tipoObraVau) {
         await tx.vAUMensal.upsert({
-          where: { uf_competencia_tipoObra: { uf: parsed.uf, competencia: parsed.competenciaVau, tipoObra: tipoObraVau as any } },
+          where: { uf_competencia_tipoObra: { uf: parsed.uf, competencia: parsed.competenciaVau, tipoObra: tipoObraVau as TipoObraVau } },
           update: { valorBase: parsed.vauManual },
-          create: { uf: parsed.uf, competencia: parsed.competenciaVau, tipoObra: tipoObraVau as any, valorBase: parsed.vauManual }
+          create: { uf: parsed.uf, competencia: parsed.competenciaVau, tipoObra: tipoObraVau as TipoObraVau, valorBase: parsed.vauManual }
         });
       }
 
@@ -164,7 +164,7 @@ export async function salvarSimulacao(input: SalvarSimulacaoInput) {
         responsavel: parsed.responsavel === "pf" ? "PF" : "PJ",
         uf: parsed.uf,
         tipoObra: TIPO_PRISMA[parsed.tipo],
-        material: parsed.material as any,
+        material: parsed.material as MaterialObra,
         preMoldado: parsed.preMoldado,
         areaConstrucao: parsed.areaConstrucao,
         areaReforma: parsed.areaReforma,
@@ -202,12 +202,13 @@ export async function salvarSimulacao(input: SalvarSimulacaoInput) {
       return { id: registro.id };
     });
     return res;
-  } catch (e: any) {
+  } catch (e) {
     console.error("Erro ao salvar simulação:", e);
-    if (e?.name === "ZodError") {
+    const err = e as { name?: string; message?: string };
+    if (err?.name === "ZodError") {
       return { error: "Verifique os dados informados. Alguns campos são inválidos ou estão faltando." };
     }
-    return { error: e.message || "Erro inesperado ao salvar simulação no banco de dados." };
+    return { error: err.message || "Erro inesperado ao salvar simulação no banco de dados." };
   }
 }
 
@@ -287,7 +288,7 @@ export async function revisarSimulacao(id: string, input: SalvarSimulacaoInput) 
         responsavel: parsed.responsavel === "pf" ? "PF" : "PJ",
         uf: parsed.uf,
         tipoObra: TIPO_PRISMA[parsed.tipo],
-        material: parsed.material as any,
+        material: parsed.material as MaterialObra,
         preMoldado: parsed.preMoldado,
         areaConstrucao: parsed.areaConstrucao,
         areaReforma: parsed.areaReforma,
@@ -325,12 +326,13 @@ export async function revisarSimulacao(id: string, input: SalvarSimulacaoInput) 
     revalidatePath("/simulacoes");
     revalidatePath(`/simulacoes/${anterior.id}`);
     return { id: registro.id };
-  } catch (e: any) {
+  } catch (e) {
     console.error("Erro ao revisar simulação:", e);
-    if (e?.name === "ZodError") {
+    const err = e as { name?: string; message?: string };
+    if (err?.name === "ZodError") {
       return { error: "Verifique os dados informados. Alguns campos são inválidos ou estão faltando." };
     }
-    return { error: e.message || "Erro inesperado ao revisar simulação." };
+    return { error: err.message || "Erro inesperado ao revisar simulação." };
   }
 }
 
@@ -345,13 +347,13 @@ export async function consultarVau(uf: string, dataFim: string, tipo: TipoObraKe
 
     // 1. Tenta buscar VAU exato no DB
     let vau = await prisma.vAUMensal.findUnique({
-      where: { uf_competencia_tipoObra: { uf, competencia, tipoObra: tipoObraVau as any } }
+      where: { uf_competencia_tipoObra: { uf, competencia, tipoObra: tipoObraVau as TipoObraVau } }
     });
 
     // 2. Fallback DB: busca a competência mais recente da UF no DB
     if (!vau) {
       vau = await prisma.vAUMensal.findFirst({
-        where: { uf, tipoObra: tipoObraVau as any },
+        where: { uf, tipoObra: tipoObraVau as TipoObraVau },
         orderBy: { createdAt: "desc" }
       });
     }
@@ -359,7 +361,7 @@ export async function consultarVau(uf: string, dataFim: string, tipo: TipoObraKe
     // 3. Fallback DB: busca a referência de SP mais recente no DB
     if (!vau) {
       vau = await prisma.vAUMensal.findFirst({
-        where: { uf: "SP", tipoObra: tipoObraVau as any },
+        where: { uf: "SP", tipoObra: tipoObraVau as TipoObraVau },
         orderBy: { createdAt: "desc" }
       });
     }

@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Scripts avulsos de coleta e a referência em JS puro não fazem parte do app.
+    "fetch_*.js",
+    "fetch_*.mjs",
+    "reference/**",
   ]),
 ]);
 
