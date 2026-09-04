@@ -57,7 +57,8 @@ export default async function InicioPage() {
   const firstName = username.split("@")[0];
   const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
 
-  const hour = new Date().getHours();
+  const agora = new Date();
+  const hour = agora.getHours();
   const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
 
   const ultimasSimulacoes = await prisma.simulacao.findMany({
@@ -78,7 +79,7 @@ export default async function InicioPage() {
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   const relativeDate = (date: Date) => {
-    const diff = Math.floor((Date.now() - date.getTime()) / 1000 / 60);
+    const diff = Math.floor((agora.getTime() - date.getTime()) / 1000 / 60);
     if (diff < 1) return "agora";
     if (diff < 60) return `${diff}min atrás`;
     if (diff < 60 * 24) return `${Math.floor(diff / 60)}h atrás`;

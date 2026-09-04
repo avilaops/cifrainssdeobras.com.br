@@ -136,12 +136,12 @@ async function main() {
       "Subindo o container",
     );
 
-    await new Promise((r) => setTimeout(r, 3000));
-
+    // O Next leva alguns segundos para abrir a porta depois do "Started";
+    // 3 s fixos davam "Connection refused" com o container saudável.
     const health = await exec(
       conn,
-      `docker exec cifra-cifra-calculadora-1 wget -qO- http://localhost:3000/api/health`,
-      "Health check",
+      `for i in $(seq 1 20); do out=$(docker exec cifra-cifra-calculadora-1 wget -qO- http://localhost:3000/api/health 2>/dev/null) && { echo "$out"; exit 0; }; sleep 3; done; echo "sem resposta em 60 s"; exit 1`,
+      "Health check (até 60 s)",
     );
     console.log("\nDeploy concluído. Health:", health.trim());
   } finally {

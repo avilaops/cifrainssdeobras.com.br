@@ -34,8 +34,8 @@ export default function ECACPage() {
       if (!res.ok) throw new Error(data.error || "Falha ao processar teste");
 
       setScreenshot(`data:image/png;base64,${data.screenshotBase64}`);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao processar teste");
     } finally {
       setLoading(false);
     }
@@ -117,6 +117,7 @@ export default function ECACPage() {
               </div>
               <span>chromium-browser --headless</span>
             </div>
+            {/* eslint-disable-next-line @next/next/no-img-element -- captura em base64, next/image não otimiza data URI */}
             <img src={screenshot} alt="e-CAC Screenshot" className="w-full object-cover" />
           </div>
         </div>

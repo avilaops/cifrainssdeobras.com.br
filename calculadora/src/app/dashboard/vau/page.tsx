@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
+import type { TipoObraVau } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const TIPO_OBRA_VAU_LABELS: Record<string, string> = {
@@ -32,7 +33,7 @@ export default async function VAUDashboardPage() {
     // Formata para MM/YYYY
     const [ano, mes] = competencia.split("-");
     const compFormatada = `${mes}/${ano}`;
-    const tipoObra = String(formData.get("tipoObra")) as any;
+    const tipoObra = String(formData.get("tipoObra")) as TipoObraVau;
     const valorBase = Number(formData.get("valorBase"));
 
     if (uf && compFormatada && tipoObra && valorBase) {
