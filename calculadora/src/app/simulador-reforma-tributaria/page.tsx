@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Banknote, Calculator, Save, FileText, ChevronDown, CheckCircle2, SlidersHorizontal
+  Banknote, Calculator, FileText, ChevronDown, SlidersHorizontal
 } from "lucide-react";
 import { brl } from "@/lib/calc/calculos";
 import { calcularReformaTributaria, type DadosReforma, type ResultadoReforma } from "@/lib/calc/reforma-tributaria";
@@ -39,11 +38,6 @@ export default function ReformaTributariaPage() {
   const [resultado, setResultado] = React.useState<ResultadoReforma | null>(null);
 
   const isAluguel = tipoOperacao.includes('Aluguel') || tipoOperacao.includes('locação');
-
-  const formatValor = (v: number) => {
-    if (!v) return "";
-    return v.toString(); // Simple for now. In real app, we use a masking library for currency.
-  };
 
   const handleCalculate = () => {
     const dados: DadosReforma = {
@@ -264,68 +258,68 @@ export default function ReformaTributariaPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl overflow-hidden border border-[#1f2919]/10 shadow-sm">
-              <table className="w-full text-sm text-left">
+            <div className="rounded-2xl overflow-x-auto border border-[#1f2919]/10 shadow-sm">
+              <table className="w-full min-w-[600px] text-sm text-left">
                 <thead className="bg-[#161c12] text-white">
                   <tr>
-                    <th className="px-6 py-4 font-medium">Regime Geral</th>
-                    <th className="px-6 py-4 font-medium text-center">Alíquota</th>
-                    <th className="px-6 py-4 font-medium text-center">Redução</th>
-                    <th className="px-6 py-4 font-medium text-center">Alíquota Reduzida</th>
-                    <th className="px-6 py-4 font-medium text-right">Débito Bruto</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium">Regime Geral</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium text-center">Alíquota</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium text-center">Redução</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium text-center">Alíquota Reduzida</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium text-right">Débito Bruto</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
                   {resultado.tabela1.map((item, i) => (
                     <tr key={i} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-gray-900">{item.nome}</td>
-                      <td className="px-6 py-4 text-center text-gray-500">{(item.aliquota * 100).toFixed(2)}%</td>
-                      <td className="px-6 py-4 text-center text-gray-500">{(item.reducao * 100).toFixed(2)}%</td>
-                      <td className="px-6 py-4 text-center text-gray-500">{(item.aliquotaReduzida * 100).toFixed(2)}%</td>
-                      <td className="px-6 py-4 text-right font-medium text-gray-900">{brl(item.debitoBruto)}</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-900">{item.nome}</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 text-center text-gray-500">{(item.aliquota * 100).toFixed(2)}%</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 text-center text-gray-500">{(item.reducao * 100).toFixed(2)}%</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 text-center text-gray-500">{(item.aliquotaReduzida * 100).toFixed(2)}%</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 text-right font-medium text-gray-900">{brl(item.debitoBruto)}</td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot className="bg-[#f2f4ee] font-medium text-gray-900">
                   <tr>
-                    <td className="px-6 py-4">Total</td>
-                    <td className="px-6 py-4 text-center">{(resultado.tabela1Total.aliquota * 100).toFixed(2)}%</td>
-                    <td className="px-6 py-4 text-center">{(resultado.tabela1Total.reducao * 100).toFixed(2)}%</td>
-                    <td className="px-6 py-4 text-center">{(resultado.tabela1Total.aliquotaReduzida * 100).toFixed(2)}%</td>
-                    <td className="px-6 py-4 text-right font-bold text-[#435738]">{brl(resultado.tabela1Total.debitoBruto)}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">Total</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-center">{(resultado.tabela1Total.aliquota * 100).toFixed(2)}%</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-center">{(resultado.tabela1Total.reducao * 100).toFixed(2)}%</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-center">{(resultado.tabela1Total.aliquotaReduzida * 100).toFixed(2)}%</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-right font-bold text-[#435738]">{brl(resultado.tabela1Total.debitoBruto)}</td>
                   </tr>
                 </tfoot>
               </table>
             </div>
 
-            <div className="rounded-2xl overflow-hidden border border-[#1f2919]/10 shadow-sm mt-6">
-              <table className="w-full text-sm text-center">
+            <div className="rounded-2xl overflow-x-auto border border-[#1f2919]/10 shadow-sm mt-6">
+              <table className="w-full min-w-[520px] text-sm text-center">
                 <thead className="bg-[#161c12] text-white">
                   <tr>
-                    <th className="px-6 py-4 font-medium text-left">Tributo</th>
-                    <th className="px-6 py-4 font-medium">Débito Bruto</th>
-                    <th className="px-6 py-4 font-medium">Créditos</th>
-                    <th className="px-6 py-4 font-medium">Tributo Líquido a Pagar</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium text-left">Tributo</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium">Débito Bruto</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium">Créditos</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium">Tributo Líquido a Pagar</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
                   <tr>
-                    <td className="px-6 py-4 font-medium text-gray-900 text-left">CBS</td>
-                    <td className="px-6 py-4 text-gray-700">{brl(resultado.tabela2.subtotalCbs)}</td>
-                    <td className="px-6 py-4 text-gray-700">{brl(resultado.tabela2.creditosCbs)}</td>
-                    <td className="px-6 py-4 font-bold text-gray-900">{brl(resultado.tabela2.cbsAPagar)}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 font-medium text-gray-900 text-left">CBS</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700">{brl(resultado.tabela2.subtotalCbs)}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700">{brl(resultado.tabela2.creditosCbs)}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 font-bold text-gray-900">{brl(resultado.tabela2.cbsAPagar)}</td>
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 font-medium text-gray-900 text-left">IBS (Estadual + Mun.)</td>
-                    <td className="px-6 py-4 text-gray-700">{brl(resultado.tabela2.subtotalIbs)}</td>
-                    <td className="px-6 py-4 text-gray-700">{brl(resultado.tabela2.creditosIbs)}</td>
-                    <td className="px-6 py-4 font-bold text-gray-900">{brl(resultado.tabela2.ibsAPagar)}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 font-medium text-gray-900 text-left">IBS (Estadual + Mun.)</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700">{brl(resultado.tabela2.subtotalIbs)}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700">{brl(resultado.tabela2.creditosIbs)}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 font-bold text-gray-900">{brl(resultado.tabela2.ibsAPagar)}</td>
                   </tr>
                 </tbody>
                 <tfoot className="bg-[#f2f4ee] font-medium text-gray-900 border-t border-gray-200">
                   <tr>
-                    <td colSpan={3} className="px-6 py-4 text-right">Carga Tributária Efetiva: <strong>{(resultado.tabela2.aliquotaEfetiva * 100).toFixed(2)}%</strong></td>
-                    <td className="px-6 py-4 font-bold text-[#1f2919]">{brl(resultado.tabela2.totalAPagar)}</td>
+                    <td colSpan={3} className="px-3 py-3 sm:px-6 sm:py-4 text-right">Carga Tributária Efetiva: <strong>{(resultado.tabela2.aliquotaEfetiva * 100).toFixed(2)}%</strong></td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 font-bold text-[#1f2919]">{brl(resultado.tabela2.totalAPagar)}</td>
                   </tr>
                 </tfoot>
               </table>
@@ -333,35 +327,35 @@ export default function ReformaTributariaPage() {
 
             <div className="pt-8 space-y-6">
               <h3 className="text-2xl font-display font-bold text-amber-600 text-center">Resumo das alíquotas</h3>
-              <div className="rounded-2xl overflow-hidden border border-[#1f2919]/10 shadow-sm">
-                <table className="w-full text-sm text-center">
+              <div className="rounded-2xl overflow-x-auto border border-[#1f2919]/10 shadow-sm">
+                <table className="w-full min-w-[520px] text-sm text-center">
                   <thead className="bg-[#161c12] text-white">
                     <tr>
-                      <th className="px-6 py-4 font-medium">Regime de Transição</th>
-                      <th className="px-6 py-4 font-medium">Alíquotas</th>
-                      <th className="px-6 py-4 font-medium">Comparativo 27%</th>
-                      <th className="px-6 py-4 font-medium">Comparativo 28%</th>
-                      <th className="px-6 py-4 font-medium">Comparativo 29%</th>
+                      <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium">Regime de Transição</th>
+                      <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium">Alíquotas</th>
+                      <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium">Comparativo 27%</th>
+                      <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium">Comparativo 28%</th>
+                      <th className="px-3 py-3 sm:px-6 sm:py-4 font-medium">Comparativo 29%</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-100">
                     {resultado.tabela3.map((item, i) => (
                       <tr key={i} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-gray-900">{item.nome}</td>
-                        <td className="px-6 py-4 text-gray-500">{(item.aliquotas * 100).toFixed(2)}%</td>
-                        <td className="px-6 py-4 text-gray-500">{(item.comparativo27 * 100).toFixed(2)}%</td>
-                        <td className="px-6 py-4 text-gray-500">{(item.comparativo28 * 100).toFixed(2)}%</td>
-                        <td className="px-6 py-4 text-gray-500">{(item.comparativo29 * 100).toFixed(2)}%</td>
+                        <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-900">{item.nome}</td>
+                        <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-500">{(item.aliquotas * 100).toFixed(2)}%</td>
+                        <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-500">{(item.comparativo27 * 100).toFixed(2)}%</td>
+                        <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-500">{(item.comparativo28 * 100).toFixed(2)}%</td>
+                        <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-500">{(item.comparativo29 * 100).toFixed(2)}%</td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot className="bg-[#f2f4ee] font-medium text-gray-900">
                     <tr>
-                      <td className="px-6 py-4">Total</td>
-                      <td className="px-6 py-4">{(resultado.tabela3Total.aliquotas * 100).toFixed(2)}%</td>
-                      <td className="px-6 py-4">{(resultado.tabela3Total.comparativo27 * 100).toFixed(2)}%</td>
-                      <td className="px-6 py-4">{(resultado.tabela3Total.comparativo28 * 100).toFixed(2)}%</td>
-                      <td className="px-6 py-4">{(resultado.tabela3Total.comparativo29 * 100).toFixed(2)}%</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">Total</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">{(resultado.tabela3Total.aliquotas * 100).toFixed(2)}%</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">{(resultado.tabela3Total.comparativo27 * 100).toFixed(2)}%</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">{(resultado.tabela3Total.comparativo28 * 100).toFixed(2)}%</td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">{(resultado.tabela3Total.comparativo29 * 100).toFixed(2)}%</td>
                     </tr>
                   </tfoot>
                 </table>

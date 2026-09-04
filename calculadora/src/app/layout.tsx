@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, Oswald } from "next/font/google";
 import { AppSidebar } from "@/components/layout/sidebar";
 import "./globals.css";
@@ -24,6 +24,15 @@ export const metadata: Metadata = {
     icon: "/icon.png",
     apple: "/icon.png",
   },
+};
+
+// viewportFit "cover" libera o env(safe-area-inset-*) no iPhone; sem ele o
+// conteúdo fica atrás da barra do Safari e o indicador de home cobre o rodapé.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f5f5ef",
 };
 
 export default function RootLayout({

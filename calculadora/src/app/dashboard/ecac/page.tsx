@@ -42,10 +42,10 @@ export default function ECACPage() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
+    <div className="mx-auto max-w-4xl space-y-8 p-4 sm:p-8">
       <div>
-        <h1 className="text-3xl font-serif text-[#002D62] mb-2 flex items-center gap-3">
-          <Bot className="w-8 h-8 text-amber-500" />
+        <h1 className="mb-2 flex items-center gap-3 text-2xl font-bold text-[#1b3629] sm:text-3xl">
+          <Bot className="w-8 h-8 text-[#2e5240]" />
           Robô e-CAC (Automação)
         </h1>
         <p className="text-gray-600">

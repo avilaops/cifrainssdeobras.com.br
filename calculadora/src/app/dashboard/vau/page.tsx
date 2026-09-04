@@ -2,9 +2,19 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+const TIPO_OBRA_VAU_LABELS: Record<string, string> = {
+  CASA_POPULAR: "Casa popular",
+  COMERCIAL_SALAS_LOJAS: "Comercial salas e lojas",
+  CONJUNTO_HABITACIONAL_POPULAR: "Conjunto habitacional popular",
+  EDIFICIO_GARAGENS: "Edifício de Garagens",
+  GALPAO_INDUSTRIAL: "Galpão industrial",
+  RESIDENCIAL_MULTIFAMILIAR: "Residencial multifamiliar",
+  RESIDENCIAL_UNIFAMILIAR: "Residencial unifamiliar",
+};
+
 export default async function VAUDashboardPage() {
   const vaus = await prisma.vAUMensal.findMany({
-    orderBy: [{ competencia: "desc" }, { uf: "asc" }],
+    orderBy: [{ competencia: "desc" }, { uf: "asc" }, { tipoObra: "asc" }],
   });
 
   async function syncSP() {
@@ -22,23 +32,24 @@ export default async function VAUDashboardPage() {
     // Formata para MM/YYYY
     const [ano, mes] = competencia.split("-");
     const compFormatada = `${mes}/${ano}`;
+    const tipoObra = String(formData.get("tipoObra")) as any;
     const valorBase = Number(formData.get("valorBase"));
 
-    if (uf && compFormatada && valorBase) {
+    if (uf && compFormatada && tipoObra && valorBase) {
       await prisma.vAUMensal.upsert({
-        where: { uf_competencia: { uf, competencia: compFormatada } },
+        where: { uf_competencia_tipoObra: { uf, competencia: compFormatada, tipoObra } },
         update: { valorBase },
-        create: { uf, competencia: compFormatada, valorBase },
+        create: { uf, competencia: compFormatada, tipoObra, valorBase },
       });
       revalidatePath("/dashboard/vau");
     }
   }
 
   return (
-    <div className="flex flex-col py-10 px-4 max-w-5xl mx-auto w-full gap-8">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 sm:gap-8 sm:py-10">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-graphite-900">Gestão de VAU</h1>
+          <h1 className="text-2xl font-bold text-graphite-900 sm:text-3xl">Gestão de VAU</h1>
           <p className="text-gray-500">Administre o Valor Unitário Básico (CUB/VAU) mensal para uso nas simulações.</p>
         </div>
         <form action={syncSP}>
@@ -65,6 +76,14 @@ export default async function VAUDashboardPage() {
               <input type="month" name="competencia" className="w-full border rounded p-2" required />
             </div>
             <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Tipo de obra</label>
+              <select name="tipoObra" className="w-full border rounded p-2" required defaultValue="RESIDENCIAL_UNIFAMILIAR">
+                {Object.entries(TIPO_OBRA_VAU_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Valor Base (R$)</label>
               <input type="number" step="0.01" name="valorBase" className="w-full border rounded p-2" placeholder="2500.00" required />
             </div>
@@ -82,18 +101,20 @@ export default async function VAUDashboardPage() {
                 <tr className="border-b border-gray-200">
                   <th className="py-2 px-4 font-semibold text-gray-600">UF</th>
                   <th className="py-2 px-4 font-semibold text-gray-600">Competência</th>
+                  <th className="py-2 px-4 font-semibold text-gray-600">Tipo de obra</th>
                   <th className="py-2 px-4 font-semibold text-gray-600">Valor Base (R$)</th>
                   <th className="py-2 px-4 font-semibold text-gray-600">Atualizado em</th>
                 </tr>
               </thead>
               <tbody>
                 {vaus.length === 0 ? (
-                  <tr><td colSpan={4} className="py-4 text-center text-gray-500">Nenhum VAU registrado ainda.</td></tr>
+                  <tr><td colSpan={5} className="py-4 text-center text-gray-500">Nenhum VAU registrado ainda.</td></tr>
                 ) : (
                   vaus.map(v => (
                     <tr key={v.id} className="border-b border-gray-50 hover:bg-gray-50">
                       <td className="py-2 px-4">{v.uf}</td>
                       <td className="py-2 px-4">{v.competencia}</td>
+                      <td className="py-2 px-4 text-sm">{TIPO_OBRA_VAU_LABELS[v.tipoObra] ?? v.tipoObra}</td>
                       <td className="py-2 px-4 font-medium text-amber-600">R$ {v.valorBase.toFixed(2)}</td>
                       <td className="py-2 px-4 text-sm text-gray-500">{v.updatedAt.toLocaleDateString("pt-BR")}</td>
                     </tr>

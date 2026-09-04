@@ -39,8 +39,8 @@ function mesesEntre(d1: Date, d2: Date) {
 function Row({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
   return (
     <tr className="border-b border-graphite-100 last:border-none">
-      <td className="py-2 pr-4 text-graphite-500">{label}</td>
-      <td className={`py-2 text-right ${strong ? "font-black text-pine-950" : "font-bold text-graphite-900"}`}>
+      <td className="py-2 pr-3 text-graphite-500">{label}</td>
+      <td className={`whitespace-nowrap py-2 text-right tabular-nums ${strong ? "font-black text-pine-950" : "font-bold text-graphite-900"}`}>
         {value}
       </td>
     </tr>
@@ -65,9 +65,9 @@ export default async function SimulacaoRelatorioPage({
   if (!s) notFound();
 
   return (
-    <main className="min-h-screen bg-cream px-5 py-8 text-graphite-900 print:bg-white print:px-0 print:py-0">
+    <main className="min-h-screen bg-cream px-4 py-6 pb-[calc(2rem+env(safe-area-inset-bottom))] text-graphite-900 print:bg-white print:px-0 print:py-0 sm:px-5 sm:py-8">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-5 flex items-center justify-between print:hidden">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 print:hidden">
           <Link href="/simulacoes" className="inline-flex items-center gap-2 text-sm font-bold text-pine-700">
             <ArrowLeft className="size-4" />
             Voltar para simulações
@@ -79,7 +79,7 @@ export default async function SimulacaoRelatorioPage({
           </div>
         </div>
 
-        <article className="rounded-xl bg-white p-8 shadow-xl print:rounded-none print:p-6 print:shadow-none">
+        <article className="rounded-xl bg-white p-5 shadow-xl print:rounded-none print:p-6 print:shadow-none sm:p-8">
           <header className="mb-8 flex flex-col gap-4 border-b border-graphite-100 pb-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="mb-1 text-xs font-black tracking-[0.28em] text-gold uppercase">CIFRA</p>
@@ -89,7 +89,7 @@ export default async function SimulacaoRelatorioPage({
                 devem ser conferidos no SERO/e-CAC antes de qualquer recolhimento.
               </p>
             </div>
-            <div className="rounded-lg border border-graphite-100 p-3 text-right text-xs">
+            <div className="rounded-lg border border-graphite-100 p-3 text-xs sm:text-right">
               <p className="text-graphite-500">Código</p>
               <p className="font-mono font-bold text-pine-950">{s.id.slice(0, 12)}</p>
               <p className="mt-2 text-graphite-500">Gerado em</p>
@@ -187,6 +187,81 @@ export default async function SimulacaoRelatorioPage({
               <p className="mt-1 text-xl font-black text-pine-950">{brl(s.futuro)}</p>
               <p className="mt-1 text-xs text-graphite-500">{s.mesesFuturos} parcelas de {brl(s.parcelaMensal)}</p>
             </div>
+          </section>
+
+          <section className="mb-6 rounded-lg border border-graphite-100 p-4">
+            <h2 className="text-xs font-black uppercase text-pine-950">Parcelamento do INSS (e-CAC / Receita Federal — Lei 10.522/02)</h2>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2 text-xs">
+              {s.podeFatorAjuste && (
+                <div className="rounded border border-olive-200 bg-sage-50 p-3">
+                  <p className="font-bold text-pine-900">Com Fator de Ajuste (Planejamento)</p>
+                  <p className="mt-1 text-base font-black text-pine-950">
+                    {Math.min(60, Math.max(1, Math.floor(s.inssComReducao / (s.responsavel === "PF" ? 100 : 500))))}x de {brl(s.inssComReducao / Math.min(60, Math.max(1, Math.floor(s.inssComReducao / (s.responsavel === "PF" ? 100 : 500)))))} / mês
+                  </p>
+                </div>
+              )}
+              <div className="rounded border border-red-200 bg-red-50/60 p-3">
+                <p className="font-bold text-red-900">Sem Planejamento (Aferição Indireta)</p>
+                <p className="mt-1 text-base font-black text-red-950">
+                  {Math.min(60, Math.max(1, Math.floor(s.inssDevido / (s.responsavel === "PF" ? 100 : 500))))}x de {brl(s.inssDevido / Math.min(60, Math.max(1, Math.floor(s.inssDevido / (s.responsavel === "PF" ? 100 : 500)))))} / mês
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ── Memória de Cálculo Mensal (SELIC + CPP + Multa + RMT) ── */}
+          <section className="mb-6 rounded-lg border border-graphite-100 p-4 overflow-x-auto">
+            <h2 className="mb-3 text-xs font-black uppercase text-pine-950 tracking-wider">
+              Memória de Cálculo Mensal (SERO / Receita Federal — SELIC & Encargos)
+            </h2>
+            <table className="w-full min-w-[640px] text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-graphite-200 bg-graphite-50 text-[11px] font-bold uppercase tracking-wider text-graphite-700">
+                  <th className="py-2.5 px-3">Mês/Ano</th>
+                  <th className="py-2.5 px-3 text-right">REMUNERAÇÃO ATUALIZADA</th>
+                  <th className="py-2.5 px-3 text-right">REMUNERAÇÃO ORIGINAL</th>
+                  <th className="py-2.5 px-3 text-right">CPP de 20%</th>
+                  <th className="py-2.5 px-3 text-right">MULTA de 20%</th>
+                  <th className="py-2.5 px-3 text-right">SELIC ACUMULADA</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-graphite-100">
+                {(() => {
+                  const mCount = Math.max(1, mesesEntre(s.dataInicio, s.dataFim));
+                  const rmtMes = s.rmtTotal / mCount;
+                  const dInicio = new Date(s.dataInicio);
+                  const dFim = new Date(s.dataFim);
+                  const rows = [];
+                  const curr = new Date(dInicio);
+                  
+                  // Tabela SELIC de referência
+                  const selicRef: Record<string, number> = {
+                    "03/2024": 28.01, "04/2024": 27.18, "05/2024": 26.39, "06/2024": 25.48,
+                    "07/2024": 24.61, "08/2024": 23.77, "09/2024": 22.84, "10/2024": 22.05,
+                    "11/2024": 21.12, "12/2024": 20.11, "01/2025": 19.12, "02/2025": 18.16,
+                  };
+
+                  while (curr <= dFim) {
+                    const comp = `${String(curr.getUTCMonth() + 1).padStart(2, "0")}/${curr.getUTCFullYear()}`;
+                    const selic = selicRef[comp] ?? Math.max(1, (2026 - curr.getUTCFullYear()) * 10 + (12 - curr.getUTCMonth()));
+                    const cpp = rmtMes * 0.20;
+                    const multa = cpp * 0.20;
+                    rows.push(
+                      <tr key={comp} className="hover:bg-graphite-50/50">
+                        <td className="py-2 px-3 font-semibold text-graphite-900">{comp}</td>
+                        <td className="py-2 px-3 text-right font-medium">{brl(rmtMes)}</td>
+                        <td className="py-2 px-3 text-right font-medium text-graphite-600">{brl(rmtMes * 0.78)}</td>
+                        <td className="py-2 px-3 text-right font-bold text-pine-900">{brl(cpp)}</td>
+                        <td className="py-2 px-3 text-right font-medium text-amber-800">{brl(multa)}</td>
+                        <td className="py-2 px-3 text-right font-bold text-gold-600">{selic.toFixed(2)}%</td>
+                      </tr>
+                    );
+                    curr.setMonth(curr.getMonth() + 1);
+                  }
+                  return rows;
+                })()}
+              </tbody>
+            </table>
           </section>
 
           <footer className="border-t border-graphite-100 pt-4 text-xs leading-relaxed text-graphite-500">

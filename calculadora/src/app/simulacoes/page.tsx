@@ -83,7 +83,7 @@ export default async function SimulacoesPage({
   const paginaHref = (p: number) => `/simulacoes?${new URLSearchParams([...query.entries(), ["pagina", String(p)]]).toString()}`;
 
   return (
-    <main className="min-h-screen bg-paper px-5 py-8 text-graphite-900">
+    <main className="min-h-screen bg-paper px-4 py-6 pb-[calc(2rem+env(safe-area-inset-bottom))] text-graphite-900 sm:px-5 sm:py-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -93,13 +93,13 @@ export default async function SimulacoesPage({
               Consulta interna dos clientes e cálculos gravados no banco.
             </p>
           </div>
-          <a
+          <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-graphite-200 bg-graphite-100 px-4 py-2 text-sm font-bold text-graphite-900 hover:bg-graphite-200"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-graphite-200 bg-graphite-100 px-4 py-2 text-sm font-bold text-graphite-900 hover:bg-graphite-200"
           >
             <Plus className="size-4" />
             Nova simulação
-          </a>
+          </Link>
         </header>
 
         {monitoramentosPendentes.length > 0 && (
@@ -192,7 +192,7 @@ export default async function SimulacoesPage({
           </div>
         </form>
 
-        <section className="mb-4 grid gap-3 sm:grid-cols-4">
+        <section className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-xl border border-graphite-200 bg-white/70 p-4">
             <p className="text-[10px] font-bold tracking-wide text-graphite-500 uppercase">Registros</p>
             <p className="mt-1 text-xl font-black">{total}</p>
@@ -221,7 +221,52 @@ export default async function SimulacoesPage({
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            {/* Celular: um cartão por simulação (a tabela de 8 colunas só se lia arrastando) */}
+            <ul className="divide-y divide-graphite-200 md:hidden">
+              {simulacoes.map((s) => (
+                <li key={s.id} className="space-y-3 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-bold">{s.nomeCliente}</p>
+                      <p className="text-xs text-graphite-500">
+                        {s.responsavel} · {s.uf} · {num(s.areaTotal)} m²
+                      </p>
+                      <p className="text-xs text-graphite-500">{tipoLabel[s.tipoObra] ?? s.tipoObra}</p>
+                    </div>
+                    <p className="shrink-0 text-[11px] text-graphite-500">{dataCurta(s.createdAt).split(" ")[0]}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-lg bg-graphite-100 px-3 py-2">
+                      <p className="text-[10px] font-bold tracking-wide text-graphite-500 uppercase">INSS devido</p>
+                      <p className="text-sm font-bold tabular-nums">{brl(s.inssDevido)}</p>
+                    </div>
+                    <div className="rounded-lg bg-sage-50 px-3 py-2">
+                      <p className="text-[10px] font-bold tracking-wide text-graphite-500 uppercase">Economia</p>
+                      <p className="text-sm font-bold tabular-nums text-pine-600">{brl(s.economiaLiquida)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <StatusSelect id={s.id} status={s.status} />
+                      <p className="mt-1 text-[10px] text-graphite-500">versão {s.versao} · {s.telefone || "sem telefone"}</p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <Link
+                        href={`/simulacoes/${s.id}`}
+                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-olive-500 px-3 text-xs font-bold text-white hover:bg-olive-400"
+                      >
+                        <FileText className="size-3.5" />
+                        Abrir
+                      </Link>
+                      <DeleteSimulationButton id={s.id} cliente={s.nomeCliente} />
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full min-w-[900px] text-sm">
                 <thead>
                   <tr className="border-b border-graphite-200 bg-graphite-100 text-left text-[11px] font-bold tracking-wide text-graphite-500 uppercase">
@@ -271,6 +316,7 @@ export default async function SimulacoesPage({
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </section>
         {totalPaginas > 1 && <nav className="mt-4 flex items-center justify-between text-sm">

@@ -17,7 +17,7 @@ import {
 interface Props {
   ano: number;
   tabelasIrpf: TabelaIRPFItem[];
-  tabelasInss: any[];
+  tabelasInss: Omit<TabelaIRPFItem, "tipo">[];
   regrasReducao: RegraReducaoIRPFItem[];
   parametros: ParametrosImpostosData;
 }
@@ -225,7 +225,7 @@ export default function IRPFClient({ ano, tabelasIrpf, tabelasInss, regrasReduca
 
               {/* IRPF Table */}
               <ResultCard title="Tabela Progressiva IRPF">
-                <table className="w-full text-xs">
+                <div className="-mx-5 overflow-x-auto px-5"><table className="w-full min-w-[420px] text-xs">
                   <thead>
                     <tr className="border-b border-[#d8dbd1]">
                       {["Faixa de Renda", "Alíquota", "Parcela a Deduzir"].map((h) => (
@@ -248,13 +248,13 @@ export default function IRPFClient({ ano, tabelasIrpf, tabelasInss, regrasReduca
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </table></div>
               </ResultCard>
 
               {/* INSS Table (monthly only) */}
               {tipoCalculo === "mensal" && tabelasInss.length > 0 && (
                 <ResultCard title="Tabela Progressiva INSS Mensal">
-                  <table className="w-full text-xs">
+                  <div className="-mx-5 overflow-x-auto px-5"><table className="w-full min-w-[420px] text-xs">
                     <thead>
                       <tr className="border-b border-[#d8dbd1]">
                         {["Faixa Salarial", "Alíquota", "Parcela a Deduzir"].map((h) => (
@@ -275,14 +275,14 @@ export default function IRPFClient({ ano, tabelasIrpf, tabelasInss, regrasReduca
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </table></div>
                 </ResultCard>
               )}
 
               {/* Reduction Rules */}
               {regrasReducaoFiltradas.length > 0 && (
                 <ResultCard title="Regras de Redução — Lei 15.270/2025">
-                  <table className="w-full text-xs">
+                  <div className="-mx-5 overflow-x-auto px-5"><table className="w-full min-w-[420px] text-xs">
                     <thead>
                       <tr className="border-b border-[#d8dbd1]">
                         {["Faixa de Renda", "Base de Subtração", "Multiplicador"].map((h) => (
@@ -299,7 +299,7 @@ export default function IRPFClient({ ano, tabelasIrpf, tabelasInss, regrasReduca
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </table></div>
                 </ResultCard>
               )}
 

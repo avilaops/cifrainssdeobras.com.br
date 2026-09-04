@@ -16,36 +16,41 @@ function WizardContent() {
   const { step, reset } = useWizard();
 
   return (
-    <div className="flex h-screen w-full flex-col lg:flex-row">
+    // Só no desktop (lg) a tela vira duas colunas com altura fixa. No celular a
+    // página rola normalmente e o resumo vira uma barra fixa no rodapé.
+    <div className="flex min-h-dvh w-full flex-col lg:h-screen lg:flex-row">
       {/* ── Main Form Area ── */}
-      <div className="flex flex-1 flex-col overflow-y-auto bg-[#f5f5ef]">
-        
+      <div className="flex min-w-0 flex-1 flex-col bg-[#f5f5ef] lg:overflow-y-auto">
+
         {/* Header */}
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[#d8dbd1] bg-[#f5f5ef]/90 px-6 py-4 backdrop-blur-md">
-          <div className="flex items-center gap-4">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[#d8dbd1] bg-[#f5f5ef]/90 px-4 py-3 backdrop-blur-md sm:px-6 sm:py-4">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <Link
               href="/ferramentas"
-              className="flex size-8 items-center justify-center rounded-lg border border-[#d8dbd1] bg-white text-[#8a9890] transition hover:border-[#1b3629]/30 hover:text-[#1b3629]"
+              className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-[#d8dbd1] bg-white text-[#8a9890] transition hover:border-[#1b3629]/30 hover:text-[#1b3629] sm:size-8"
               title="Voltar para ferramentas"
+              aria-label="Voltar para ferramentas"
             >
               <ChevronLeft className="size-4" />
             </Link>
-            <h1 className="text-lg font-black tracking-tight text-[#1b3629]">
+            <h1 className="truncate text-base font-black tracking-tight text-[#1b3629] sm:text-lg">
               Simulador de Obra Predial
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <Link
               href="/simulacoes"
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-[#6b7a70] transition hover:bg-[#eef0eb] hover:text-[#1b3629]"
+              className="flex min-h-9 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-[#6b7a70] transition hover:bg-[#eef0eb] hover:text-[#1b3629]"
+              aria-label="Histórico de simulações"
             >
               <History className="size-4" />
               <span className="hidden sm:inline">Histórico</span>
             </Link>
             <button
               onClick={reset}
-              className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-[#1b3629] shadow-xs transition hover:bg-[#f9faf7]"
+              className="flex min-h-9 items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-[#1b3629] shadow-xs transition hover:bg-[#f9faf7]"
+              aria-label="Nova simulação"
             >
               <FilePlus className="size-4" />
               <span className="hidden sm:inline">Nova simulação</span>
@@ -54,12 +59,12 @@ function WizardContent() {
         </header>
 
         {/* Step Nav */}
-        <div className="border-b border-[#eef0eb] bg-white px-6 py-3">
+        <div className="border-b border-[#eef0eb] bg-white px-4 py-3 sm:px-6">
           <StepNav />
         </div>
 
-        {/* Form Body */}
-        <main className="flex-1 p-6 lg:p-8">
+        {/* Form Body — pb extra no celular para o conteúdo não ficar atrás da barra de resumo */}
+        <main className="flex-1 p-4 pb-32 sm:p-6 sm:pb-32 lg:p-8">
           <div className="mx-auto max-w-2xl">
             {step === "obra" && <StepObra />}
             {step === "areas" && <StepAreas />}
@@ -70,7 +75,7 @@ function WizardContent() {
         </main>
       </div>
 
-      {/* ── Summary Panel ── */}
+      {/* ── Summary Panel (coluna no desktop, barra + folha no celular) ── */}
       <SummaryPanel />
     </div>
   );

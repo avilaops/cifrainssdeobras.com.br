@@ -88,7 +88,7 @@ export default async function InicioPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f5ef]">
-      <div className="mx-auto max-w-[1120px] px-6 py-8 lg:py-10">
+      <div className="mx-auto max-w-[1120px] px-4 py-6 sm:px-6 sm:py-8 lg:py-10">
 
         {/* ── Greeting ───────────────────────── */}
         <div className="mb-8">
