@@ -8,6 +8,26 @@ Os problemas estão em ordem de gravidade. Cada um aponta o arquivo e a linha.
 
 ---
 
+## 0. O que só apareceu no screenshot real
+
+### 0.1 O conteúdo ocupava 60% da tela
+
+**Onde:** `calculadora/src/app/layout.tsx:44` (antes da correção)
+
+```tsx
+<body className="flex h-full min-h-screen bg-[#f5f5ef]">
+  <AppSidebar />
+  <div className="flex min-w-0 flex-1 flex-col ...">
+```
+
+O `AppSidebar` devolve um fragmento com três irmãos: a barra do menu do celular (`sticky ... md:hidden`), o overlay e o `<aside>`. Com o `body` em `flex` (linha), a barra do menu virava um **item de flex ao lado do conteúdo**: uma coluna vazia de ~40% à esquerda, em toda tela do app no celular. É a faixa clara à esquerda nas 4 fotos originais (e a razão de os cartões, filtros e tabelas parecerem espremidos).
+
+Não estava no levantamento por leitura de código. Só apareceu ao rodar o Playwright em 390 px depois do primeiro deploy: o overflow horizontal do `/simulacoes` e do relatório vinha daí.
+
+**Correção (03/09):** `flex-col` abaixo de `md`, `md:flex-row` acima. Verificado com screenshot: overflow zero nas 14 telas capturadas.
+
+---
+
 ## 1. Bloqueantes (a tela quebra)
 
 ### 1.1 O painel rola de lado e corta o conteúdo
