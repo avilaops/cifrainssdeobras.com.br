@@ -14,11 +14,11 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { uf, competencia, valorBase } = await req.json();
+    const { uf, competencia, tipoObra, valorBase } = await req.json();
     const vau = await prisma.vAUMensal.upsert({
-      where: { uf_competencia: { uf, competencia } },
+      where: { uf_competencia_tipoObra: { uf, competencia, tipoObra } },
       update: { valorBase: Number(valorBase) },
-      create: { uf, competencia, valorBase: Number(valorBase) },
+      create: { uf, competencia, tipoObra, valorBase: Number(valorBase) },
     });
     return NextResponse.json(vau);
   } catch (error) {

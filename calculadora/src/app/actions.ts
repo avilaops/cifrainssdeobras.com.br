@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { Prisma, StatusSimulacao, TipoAuditoria, TipoObra } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { calcularINSS, type SimulacaoInput } from "@/lib/calc/calculos";
-import type { TipoObraKey } from "@/lib/calc/dados";
+import { TIPO_OBRA_VAU, MULT_TIPO, type TipoObraKey } from "@/lib/calc/dados";
 import { AUTH_COOKIE, getSessionUser } from "@/lib/auth";
 import { normalizeTelefone, simulacaoSchema } from "@/lib/validations";
 
@@ -38,9 +38,16 @@ async function usuarioAtual() {
   return (await getSessionUser(cookieStore.get(AUTH_COOKIE)?.value)) || "sistema";
 }
 
+function competenciaDe(input: SalvarSimulacaoInput): string {
+  if (input.competenciaVau) return input.competenciaVau;
+  const d = new Date(input.dataFim);
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  return `${m}/${d.getUTCFullYear()}`;
+}
+
 async function dadosResultado(input: SalvarSimulacaoInput) {
   const parsed = simulacaoSchema.parse(input);
-  
+
   const parametros = await prisma.parametrosImpostos.findUnique({ where: { competencia: "2026" } });
   const dbParam = parametros ? {
     percentualUsinado: parametros.percentualUsinado,
@@ -54,7 +61,60 @@ async function dadosResultado(input: SalvarSimulacaoInput) {
     minPercentDctfwebMais350: regrasArray[1].minPercentDctfweb,
   } : undefined;
 
-  const resultado = calcularINSS(parsed, dbParam, dbRegras);
+  const competencia = competenciaDe(parsed);
+
+  // 1. Busca VAU no Banco de Dados
+  let vauRows = await prisma.vAUMensal.findMany({ where: { uf: parsed.uf, competencia } });
+
+  // Fallback DB 1: Se a competência informada não estiver no DB, pega a mais recente da UF no DB
+  if (vauRows.length === 0) {
+    const latestForUf = await prisma.vAUMensal.findFirst({
+      where: { uf: parsed.uf },
+      orderBy: { createdAt: "desc" },
+    });
+    if (latestForUf) {
+      vauRows = await prisma.vAUMensal.findMany({
+        where: { uf: parsed.uf, competencia: latestForUf.competencia },
+      });
+    }
+  }
+
+  // Fallback DB 2: Se a UF não estiver no DB, usa a referência de "SP" mais recente do DB
+  if (vauRows.length === 0) {
+    const latestSp = await prisma.vAUMensal.findFirst({
+      where: { uf: "SP" },
+      orderBy: { createdAt: "desc" },
+    });
+    if (latestSp) {
+      vauRows = await prisma.vAUMensal.findMany({
+        where: { uf: "SP", competencia: latestSp.competencia },
+      });
+    }
+  }
+
+  const dbVau = vauRows.length > 0
+    ? Object.fromEntries(vauRows.map((r) => [r.tipoObra, r.valorBase]))
+    : undefined;
+
+  // 2. Busca Índice de Correção SERO no Banco de Dados (mês de início da obra)
+  const dInicio = new Date(parsed.dataInicio);
+  const mInicio = String(dInicio.getUTCMonth() + 1).padStart(2, "0");
+  const yInicio = dInicio.getUTCFullYear();
+  const compInicio = `${mInicio}/${yInicio}`;
+
+  const seroIndice = await prisma.indiceCorrecaoSERO.findFirst({
+    where: { competencia: compInicio },
+    orderBy: { createdAt: "desc" },
+  });
+  const dbSeroFator = seroIndice ? seroIndice.fator : 0;
+
+  // 3. Busca Tabela de Taxas SELIC Acumuladas no Banco de Dados
+  const selicRows = await prisma.tabelaSelicSERO.findMany({
+    where: { dataReferencia: "08/2026" },
+  });
+  const dbSelic = Object.fromEntries(selicRows.map((r) => [r.competencia, r.taxaPercent]));
+
+  const resultado = calcularINSS(parsed, dbParam, dbRegras, dbVau, dbSeroFator, dbSelic);
   return { parsed, resultado };
 }
 
@@ -86,11 +146,12 @@ export async function salvarSimulacao(input: SalvarSimulacaoInput) {
         },
       });
 
-      if (parsed.vauManual && parsed.vauManual > 0 && parsed.competenciaVau) {
+      const tipoObraVau = TIPO_OBRA_VAU[parsed.tipo];
+      if (parsed.vauManual && parsed.vauManual > 0 && parsed.competenciaVau && tipoObraVau) {
         await tx.vAUMensal.upsert({
-          where: { uf_competencia: { uf: parsed.uf, competencia: parsed.competenciaVau } },
+          where: { uf_competencia_tipoObra: { uf: parsed.uf, competencia: parsed.competenciaVau, tipoObra: tipoObraVau as any } },
           update: { valorBase: parsed.vauManual },
-          create: { uf: parsed.uf, competencia: parsed.competenciaVau, valorBase: parsed.vauManual }
+          create: { uf: parsed.uf, competencia: parsed.competenciaVau, tipoObra: tipoObraVau as any, valorBase: parsed.vauManual }
         });
       }
 
@@ -273,18 +334,43 @@ export async function revisarSimulacao(id: string, input: SalvarSimulacaoInput) 
   }
 }
 
-export async function consultarVau(uf: string, dataFim: string) {
+export async function consultarVau(uf: string, dataFim: string, tipo: TipoObraKey) {
   try {
     const d = new Date(dataFim);
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const y = d.getFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const y = d.getUTCFullYear();
     const competencia = `${m}/${y}`;
 
-    const vau = await prisma.vAUMensal.findUnique({
-      where: { uf_competencia: { uf, competencia } }
+    const tipoObraVau = TIPO_OBRA_VAU[tipo] || "RESIDENCIAL_UNIFAMILIAR";
+
+    // 1. Tenta buscar VAU exato no DB
+    let vau = await prisma.vAUMensal.findUnique({
+      where: { uf_competencia_tipoObra: { uf, competencia, tipoObra: tipoObraVau as any } }
     });
 
-    return { competencia, valor: vau?.valorBase || null };
+    // 2. Fallback DB: busca a competência mais recente da UF no DB
+    if (!vau) {
+      vau = await prisma.vAUMensal.findFirst({
+        where: { uf, tipoObra: tipoObraVau as any },
+        orderBy: { createdAt: "desc" }
+      });
+    }
+
+    // 3. Fallback DB: busca a referência de SP mais recente no DB
+    if (!vau) {
+      vau = await prisma.vAUMensal.findFirst({
+        where: { uf: "SP", tipoObra: tipoObraVau as any },
+        orderBy: { createdAt: "desc" }
+      });
+    }
+
+    let valorFinal = vau?.valorBase || null;
+    if (valorFinal && !TIPO_OBRA_VAU[tipo]) {
+      const mult = MULT_TIPO[tipo] || 1;
+      valorFinal = Math.round(valorFinal * mult);
+    }
+
+    return { competencia: vau?.competencia || competencia, valor: valorFinal };
   } catch (error) {
     console.error("Erro ao consultar VAU:", error);
     return { competencia: "", valor: null };

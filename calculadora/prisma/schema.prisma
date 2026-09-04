@@ -171,15 +171,26 @@ model Auditoria {
 }
 
 model VAUMensal {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   uf          String
   competencia String // Ex: "08/2026"
+  tipoObra    TipoObraVau
   valorBase   Float
 
-  @@unique([uf, competencia])
+  @@unique([uf, competencia, tipoObra])
   @@map("vau_mensal")
+}
+
+enum TipoObraVau {
+  CASA_POPULAR
+  COMERCIAL_SALAS_LOJAS
+  CONJUNTO_HABITACIONAL_POPULAR
+  EDIFICIO_GARAGENS
+  GALPAO_INDUSTRIAL
+  RESIDENCIAL_MULTIFAMILIAR
+  RESIDENCIAL_UNIFAMILIAR
 }
 
 model TabelaINSS {
@@ -227,4 +238,35 @@ model RegraReducaoIRPF {
   updatedAt         DateTime @updatedAt
 
   @@map("regra_reducao_irpf")
+}
+
+/// Índices de Correção Monetária do SERO (e-CAC / Receita Federal).
+/// Representa quanto um valor de `competencia` precisa ser corrigido
+/// para chegar ao valor equivalente em `dataReferencia`.
+/// Fonte: e-CAC > SERO > Índices de Correção Monetária.
+model IndiceCorrecaoSERO {
+  id             String   @id @default(cuid())
+  competencia    String   // Ex: "01/2021"
+  fator          Float    // Ex: 0.6083 (= 60,83% de correção)
+  dataReferencia String   // Ex: "08/2026" — mês-base desta consulta
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([competencia, dataReferencia])
+  @@map("indice_correcao_sero")
+}
+
+/// Taxas SELIC Acumuladas por Competência (Receita Federal / e-CAC).
+/// Representa a SELIC acumulada para apuração previdenciária
+/// daquela competência até a dataReferencia.
+model TabelaSelicSERO {
+  id             String   @id @default(cuid())
+  competencia    String   // Ex: "03/2024"
+  taxaPercent    Float    // Ex: 28.01 (= 28,01%)
+  dataReferencia String   // Ex: "08/2026" — mês-base desta apuração
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([competencia, dataReferencia])
+  @@map("tabela_selic_sero")
 }

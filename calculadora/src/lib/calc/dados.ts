@@ -21,6 +21,17 @@ export const TIPOS_OBRA = {
 
 export type TipoObraKey = keyof typeof TIPOS_OBRA;
 
+/**
+ * Mapeia os tipos do simulador para as colunas da Tabela VAU oficial (e-CAC/Receita Federal).
+ * Tipos sem coluna oficial (mista e não-prediais) continuam no VAU_BASE hardcoded.
+ */
+export const TIPO_OBRA_VAU: Partial<Record<TipoObraKey, string>> = {
+  residencial: "RESIDENCIAL_UNIFAMILIAR",
+  multifamiliar: "RESIDENCIAL_MULTIFAMILIAR",
+  comercial: "COMERCIAL_SALAS_LOJAS",
+  industrial: "GALPAO_INDUSTRIAL",
+};
+
 /** Percentuais de equivalência de área por destinação (IN 2.021/2021). */
 export const PERCENTUAL_EQUIVALENCIA: Record<TipoObraKey, number> = {
   residencial: 0.89,
@@ -38,14 +49,10 @@ export const PERCENTUAL_EQUIVALENCIA: Record<TipoObraKey, number> = {
   naoPredial: 1.00,
 };
 
-export const VAU_BASE: Record<string, number> = {
-  SP: 2661, RJ: 2450, MG: 2190, RS: 2250, PR: 2220,
-  SC: 2260, DF: 2400, ES: 2150, GO: 2020, MT: 2050,
-  MS: 2000, AM: 2080, PA: 1920, BA: 1950, PE: 1980,
-  CE: 1920, MA: 1830, PI: 1840, RN: 1900, PB: 1880,
-  AL: 1860, SE: 1870, TO: 1950, AP: 1880, RR: 1920,
-  RO: 1980, AC: 1940,
-};
+/**
+ * Tabela VAU de referência (obsoleta — a fonte de verdade é a tabela `vau_mensal` do Banco de Dados).
+ */
+export const VAU_BASE: Record<string, number> = {};
 
 export const MULT_TIPO: Record<TipoObraKey, number> = {
   residencial: 1.0,
@@ -90,7 +97,7 @@ const MULT_MATERIAL: Record<string, number> = {
 };
 
 export function getVAU(uf: string, tipo: TipoObraKey, material = "ALVENARIA"): number {
-  const base = VAU_BASE[uf] || VAU_BASE.SP;
+  const base = VAU_BASE[uf] || VAU_BASE.SP || 2600;
   const mult = MULT_TIPO[tipo] || 1;
   const multMat = MULT_MATERIAL[material] || 1;
   return Math.round(base * mult * multMat);

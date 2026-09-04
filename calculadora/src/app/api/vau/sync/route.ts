@@ -18,9 +18,9 @@ export async function POST() {
     const competencia = `${mes}/${ano}`;
 
     const vau = await prisma.vAUMensal.upsert({
-      where: { uf_competencia: { uf: "SP", competencia } },
+      where: { uf_competencia_tipoObra: { uf: "SP", competencia, tipoObra: "RESIDENCIAL_UNIFAMILIAR" } },
       update: { valorBase: valorBaseFake },
-      create: { uf: "SP", competencia, valorBase: valorBaseFake },
+      create: { uf: "SP", competencia, tipoObra: "RESIDENCIAL_UNIFAMILIAR", valorBase: valorBaseFake },
     });
 
     return NextResponse.json({ success: true, vau });

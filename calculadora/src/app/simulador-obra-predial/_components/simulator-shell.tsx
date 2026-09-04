@@ -159,7 +159,7 @@ export function SimulatorShell({ children }: { children: React.ReactNode }) {
   // Auto-fetch VAU whenever uf or dataFim changes
   React.useEffect(() => {
     if (!state.uf || !state.dataFim) return;
-    consultarVau(state.uf, state.dataFim).then((res) => {
+    consultarVau(state.uf, state.dataFim, state.tipoObra).then((res) => {
       if (res.valor) {
         patch({
           competenciaVau: res.competencia,
@@ -179,7 +179,7 @@ export function SimulatorShell({ children }: { children: React.ReactNode }) {
       }
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.uf, state.dataFim]);
+  }, [state.uf, state.dataFim, state.tipoObra]);
 
   const buildCalcInput = React.useCallback(() => {
     const areaPiscina = state.piscinaCoberta + state.piscinaDescoberta;

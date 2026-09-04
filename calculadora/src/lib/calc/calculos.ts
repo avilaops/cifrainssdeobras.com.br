@@ -14,8 +14,10 @@
  */
 import {
   type TipoObraKey,
+  MULT_TIPO,
   PERCENTUAL_EQUIVALENCIA,
   PERCENTUAL_RMT_NAO_PREDIAL,
+  TIPO_OBRA_VAU,
   getFatorSocial,
   getReducaoFatorAjuste,
   getVAU,
@@ -47,6 +49,17 @@ export interface SimulacaoInput {
   percHonorarios: number;
 }
 
+export interface ItemMemoriaCalculoMensal {
+  competencia: string;
+  remuneracaoAtualizada: number;
+  remuneracaoOriginal: number;
+  cpp20: number;
+  multa20: number;
+  selicPercent: number;
+  jurosSelic: number;
+  totalDevidoMes: number;
+}
+
 export interface SimulacaoResultado {
   vauUsado: number;
   areaTotal: number;
@@ -72,6 +85,14 @@ export interface SimulacaoResultado {
   mesesRetro: number;
   multaMaed: number;
   parcelaMensal: number;
+  fatorCorrecaoSero: number;
+  retroativoCorrigido: number;
+  inssDevidoCorrigido: number;
+  qtdParcelasEcacDevido: number;
+  valorParcelaEcacDevido: number;
+  qtdParcelasEcacAjustado: number;
+  valorParcelaEcacAjustado: number;
+  memoriaCalculoMensal: ItemMemoriaCalculoMensal[];
 }
 
 function round2(num: number): number {
@@ -89,14 +110,42 @@ export interface DbRegras {
   minPercentDctfwebMais350: number; // usually 0.70
 }
 
-export function calcularINSS(p: SimulacaoInput, dbParam?: DbParametros, dbRegras?: DbRegras): SimulacaoResultado {
+/** VAU oficial (e-CAC/Receita) para a UF+competência da simulação, por coluna da tabela (ver TIPO_OBRA_VAU). */
+export type DbVau = Partial<Record<string, number>>;
+
+/** Taxas SELIC Acumuladas por Competência ("MM/YYYY" -> taxaPercent). */
+export type DbSelic = Record<string, number>;
+
+function resolveVau(p: SimulacaoInput, tipo: TipoObraKey, dbVau: DbVau | undefined): number {
+  const coluna = TIPO_OBRA_VAU[tipo];
+  if (dbVau) {
+    if (coluna && dbVau[coluna] !== undefined) {
+      return dbVau[coluna]!;
+    }
+    const baseDb = dbVau["RESIDENCIAL_UNIFAMILIAR"] ?? Object.values(dbVau)[0];
+    if (baseDb !== undefined) {
+      const mult = MULT_TIPO[tipo] ?? 1;
+      return Math.round(baseDb * mult);
+    }
+  }
+  return getVAU(p.uf, tipo, p.material);
+}
+
+export function calcularINSS(
+  p: SimulacaoInput,
+  dbParam?: DbParametros,
+  dbRegras?: DbRegras,
+  dbVau?: DbVau,
+  dbSeroFator?: number,
+  dbSelic?: DbSelic
+): SimulacaoResultado {
   const hoje = new Date();
 
   const vauManual = p.vauManual ?? 0;
-  const vau = vauManual > 0 ? vauManual : getVAU(p.uf, p.tipo, p.material);
-  const vauReforma = vauManual > 0 ? vauManual * 0.55 : getVAU(p.uf, "reforma", p.material);
-  const vauDemolicao = vauManual > 0 ? vauManual * 0.3 : getVAU(p.uf, "demolicao", p.material);
-  const vauPiscina = vauManual > 0 ? vauManual * 0.9 : getVAU(p.uf, "piscina", p.material);
+  const vau = vauManual > 0 ? vauManual : resolveVau(p, p.tipo, dbVau);
+  const vauReforma = vauManual > 0 ? vauManual * 0.55 : resolveVau(p, "reforma", dbVau);
+  const vauDemolicao = vauManual > 0 ? vauManual * 0.3 : resolveVau(p, "demolicao", dbVau);
+  const vauPiscina = vauManual > 0 ? vauManual * 0.9 : resolveVau(p, "piscina", dbVau);
 
   const areaConstrucao = p.areaConstrucao || 0;
   const areaReforma = p.areaReforma || 0;
@@ -171,11 +220,59 @@ export function calcularINSS(p: SimulacaoInput, dbParam?: DbParametros, dbRegras
   const futuro = round2(inssComReducao * proporcaoFuturo);
   const parcelaMensal = mesesFuturos > 0 ? round2(futuro / mesesFuturos) : 0;
 
-  // 8. Economia Gerada (O custo total com planejamento é INSS + MAED)
+  // 8. Correção Monetária SERO (via banco de dados)
+  const fatorCorrecaoSero = dbSeroFator ?? 0;
+  const retroativoCorrigido = round2(retroativo * (1 + fatorCorrecaoSero));
+  const inssDevidoCorrigido = round2(inssDevido * (1 + fatorCorrecaoSero));
+
+  // 9. Economia Gerada (O custo total com planejamento é INSS + MAED)
   const economiaImposto = round2(inssDevido - (inssComReducao + multaMaed));
   const reducaoPercent = inssDevido > 0 ? (economiaImposto / inssDevido) * 100 : 0;
   const honorarios = round2(economiaImposto * (p.percHonorarios ?? 0.30));
   const economiaLiq = round2(economiaImposto - honorarios);
+
+  // 10. Parcelamento e-CAC (Receita Federal — até 60 parcelas mensais, mínimo R$100 PF / R$500 PJ)
+  const minParcela = p.responsavel === "pf" ? 100 : 500;
+
+  const qtdParcelasEcacDevido = inssDevido > 0 ? Math.min(60, Math.max(1, Math.floor(inssDevido / minParcela))) : 1;
+  const valorParcelaEcacDevido = round2(inssDevido / qtdParcelasEcacDevido);
+
+  const qtdParcelasEcacAjustado = inssComReducao > 0 ? Math.min(60, Math.max(1, Math.floor(inssComReducao / minParcela))) : 1;
+  const valorParcelaEcacAjustado = round2(inssComReducao / qtdParcelasEcacAjustado);
+
+  // 11. Memória de Cálculo Mensal Detalhada (Mês a Mês: RMT, CPP 20%, Multa 20%, SELIC Acumulada)
+  const memoriaCalculoMensal: ItemMemoriaCalculoMensal[] = [];
+  const dInicio = new Date(p.dataInicio);
+  const dFim = new Date(p.dataFim);
+
+  const mesesContados = Math.max(1, mesesEntreDatas(p.dataInicio, p.dataFim));
+  const rmtPorMesAtualizada = round2(rmtTotal / mesesContados);
+  const fatorCorr = dbSeroFator ?? 0;
+  const rmtPorMesOriginal = fatorCorr > 0 ? round2(rmtPorMesAtualizada / (1 + fatorCorr)) : rmtPorMesAtualizada;
+
+  for (let d = new Date(dInicio); d <= dFim; d.setMonth(d.getMonth() + 1)) {
+    const mes = new Date(d);
+    const mStr = String(mes.getUTCMonth() + 1).padStart(2, "0");
+    const yStr = mes.getUTCFullYear();
+    const comp = `${mStr}/${yStr}`;
+
+    const selicPercent = dbSelic?.[comp] ?? 0;
+    const cpp20 = round2(rmtPorMesOriginal * 0.20);
+    const multa20 = round2(cpp20 * 0.20);
+    const jurosSelic = round2(cpp20 * (selicPercent / 100));
+    const totalDevidoMes = round2(cpp20 + multa20 + jurosSelic);
+
+    memoriaCalculoMensal.push({
+      competencia: comp,
+      remuneracaoAtualizada: rmtPorMesAtualizada,
+      remuneracaoOriginal: rmtPorMesOriginal,
+      cpp20,
+      multa20,
+      selicPercent,
+      jurosSelic,
+      totalDevidoMes,
+    });
+  }
 
   return {
     vauUsado: vau,
@@ -202,6 +299,14 @@ export function calcularINSS(p: SimulacaoInput, dbParam?: DbParametros, dbRegras
     mesesRetro,
     multaMaed,
     parcelaMensal,
+    fatorCorrecaoSero,
+    retroativoCorrigido,
+    inssDevidoCorrigido,
+    qtdParcelasEcacDevido,
+    valorParcelaEcacDevido,
+    qtdParcelasEcacAjustado,
+    valorParcelaEcacAjustado,
+    memoriaCalculoMensal,
   };
 }
 
