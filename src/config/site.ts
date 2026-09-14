@@ -3,6 +3,10 @@
  * Dados ainda não fornecidos pela empresa ficam como placeholders explícitos
  * ("" ou null) e simplesmente não são exibidos na interface.
  */
+const calculatorUrl =
+  process.env.NEXT_PUBLIC_CALCULADORA_URL ||
+  "https://app.cifrainssdeobras.com.br";
+
 export const siteConfig = {
   name: "CIFRA",
   legalName: "CIFRA — Consultoria Tributária de Obra",
@@ -10,7 +14,7 @@ export const siteConfig = {
     "Consultoria especializada em INSS de obra, CNO, SERO, aferição e regularização tributária de obras em todo o Brasil.",
   url: "https://cifrainssdeobras.com.br",
   domain: "cifrainssdeobras.com.br",
-  calculatorUrl: process.env.NEXT_PUBLIC_CALCULADORA_URL || "https://app.cifrainssdeobras.com",
+  calculatorUrl,
 
   seo: {
     title: "CIFRA | Consultoria de INSS de Obra e Regularização",
@@ -46,7 +50,7 @@ export const siteConfig = {
     { label: "Início", href: "/" },
     { label: "Sobre", href: "/sobre/" },
     { label: "Serviços", href: "/servicos/" },
-    { label: "Calculadora", href: process.env.NEXT_PUBLIC_CALCULADORA_URL || "https://app.cifrainssdeobras.com" },
+    { label: "Calculadora", href: calculatorUrl },
     { label: "Como funciona", href: "/#como-funciona" },
     { label: "Parceiros", href: "/parceiros/" },
     { label: "Dúvidas", href: "/#duvidas" },

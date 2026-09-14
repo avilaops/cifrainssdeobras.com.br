@@ -1,6 +1,6 @@
-﻿# CIFRA — Website e Calculadora de INSS de Obra
+﻿# CIFRA, Website e Calculadora de INSS de Obra
 
-Plataforma digital da **CIFRA — Consultoria Tributária de Obra**, especializada em INSS de obra, CNO, SERO, aferição e regularização tributária.
+Plataforma digital da **CIFRA, Consultoria Tributária de Obra**, especializada em INSS de obra, CNO, SERO, aferição e regularização tributária.
 
 O projeto reúne:
 

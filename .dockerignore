@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+.git
+coverage
+*.log
+*.tsbuildinfo
+# .env.local é só para dev na máquina local; se entrar no build do Docker,
+# o Next prioriza .env.local sobre .env.production e o site em produção
+# sai com URLs de localhost embutidas.
+.env.local

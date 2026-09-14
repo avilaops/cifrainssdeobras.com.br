@@ -1,4 +1,4 @@
-import { TAGFLOW_CONFIG } from "@/config/tagflow";
+import { IS_TAGFLOW_CONFIGURED, TAGFLOW_CONFIG } from "@/config/tagflow";
 
 export const TAGFLOW_EVENTS = [
   "page_view",
@@ -138,6 +138,50 @@ function sanitize(payload: TagflowPayload) {
   );
 }
 
+/**
+ * Quais eventos daqui são a conversão do site, do ponto de vista do GA4.
+ *
+ * O site não fecha negócio na própria página: a solicitação termina no
+ * WhatsApp. Estes quatro são os últimos sinais observáveis antes de a pessoa
+ * sair, e viram um único `generate_lead` no GA4.
+ *
+ * `whatsapp_redirect` e `form_submit` ficam de fora de propósito: eles
+ * acontecem no mesmo gesto que `click_whatsapp` e `lead`, e mapear os dois
+ * contaria cada lead duas vezes no relatório.
+ */
+const GA4_LEAD_SOURCE: Partial<Record<TagflowEventName, string>> = {
+  click_whatsapp: "whatsapp",
+  click_phone: "telefone",
+  click_email: "email",
+  lead: "formulario",
+};
+
+/**
+ * Espelha a conversão no dataLayer, para a tag do container GTM-56HK6D2Q
+ * traduzir em GA4 e em conversão de Ads.
+ *
+ * Vai só `lead_source` e `lead_subject`: o payload interno carrega tipo de
+ * cliente e situação da obra, que servem ao CRM e não têm por que atravessar
+ * para o Google.
+ */
+function pushGa4Lead(event: TagflowEventName, payload: TagflowPayload) {
+  const leadSource = GA4_LEAD_SOURCE[event];
+  if (!leadSource) return;
+
+  const subject = payload.placement ?? payload.source ?? payload.formId;
+
+  const target = window as Window & {
+    dataLayer?: Array<Record<string, unknown>>;
+  };
+  target.dataLayer = target.dataLayer || [];
+  target.dataLayer.push({
+    event: "generate_lead",
+    lead_source: leadSource,
+    ...(subject ? { lead_subject: String(subject) } : {}),
+    page_path: window.location.pathname,
+  });
+}
+
 export function trackTagflowEvent(
   event: TagflowEventName,
   payload: TagflowPayload = {},
@@ -148,7 +192,12 @@ export function trackTagflowEvent(
 
   const consent = readConsent();
   if (!consent.analytics && !consent.marketing) return null;
-  if (!TAGFLOW_CONFIG.enabled || !TAGFLOW_CONFIG.endpoint) return null;
+
+  // Antes do early-return abaixo: o GTM é independente do endpoint interno, e
+  // com o Tagflow próprio desligado o GA4 continuaria tendo que medir o lead.
+  pushGa4Lead(event, payload);
+
+  if (!IS_TAGFLOW_CONFIGURED) return null;
 
   try {
     const campaign = captureCampaign();

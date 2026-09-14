@@ -155,7 +155,7 @@ export function SavingsSection() {
                 </Button>
               ) : null}
             </div>
-            <p className="mt-3 text-center text-xs text-graphite-400">
+            <p className="mt-3 text-center text-xs text-graphite-500">
               Sem compromisso. Seus dados seguem para o formulário de análise.
             </p>
           </form>

@@ -63,7 +63,7 @@ export function HeroSimulator() {
             <p className="text-sm font-bold text-graphite-900">
               Análise tributária da obra
             </p>
-            <p className="text-xs text-graphite-400">
+            <p className="text-xs text-graphite-500">
               Comece agora — leva menos de 1 minuto
             </p>
           </div>
@@ -123,7 +123,7 @@ export function HeroSimulator() {
         Enviar para análise
         <ArrowRight aria-hidden="true" />
       </Button>
-      <p className="mt-3 text-center text-xs text-graphite-400">
+      <p className="mt-3 text-center text-xs text-graphite-500">
         Sem compromisso. Você confirma os dados no formulário a seguir.
       </p>
 

@@ -9,4 +9,6 @@ export const TAGFLOW_CONFIG = {
 } as const;
 
 export const IS_TAGFLOW_CONFIGURED =
-  TAGFLOW_CONFIG.enabled && /^https:\/\//.test(TAGFLOW_CONFIG.endpoint);
+  TAGFLOW_CONFIG.enabled &&
+  /^https:\/\//i.test(TAGFLOW_CONFIG.endpoint) &&
+  !/(?:seu-endpoint|example\.com|localhost)/i.test(TAGFLOW_CONFIG.endpoint);

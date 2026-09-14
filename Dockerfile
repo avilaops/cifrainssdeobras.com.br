@@ -4,17 +4,18 @@ FROM base AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-COPY . .
+COPY next.config.ts tsconfig.json next-env.d.ts postcss.config.mjs ./
+COPY .env.production ./
+COPY public ./public
+COPY src ./src
+# Variável embutida no bundle em build time; vinda como ENV, tem precedência
+# sobre qualquer .env.local residual copiado pelo contexto.
+ARG NEXT_PUBLIC_CALCULADORA_URL=https://app.cifrainssdeobras.com.br
+ENV NEXT_PUBLIC_CALCULADORA_URL=$NEXT_PUBLIC_CALCULADORA_URL
 RUN npm run build
 
-FROM base AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-COPY --from=builder /app/public ./public
-# Como o projeto não está com output: 'standalone', vamos copiar tudo e usar next start
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
+FROM nginx:1.27-alpine AS runner
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/out /usr/share/nginx/html
 
 EXPOSE 3000
-CMD ["npm", "run", "start"]

@@ -1,7 +1,4 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 interface RevealProps {
   children: ReactNode;
@@ -11,25 +8,17 @@ interface RevealProps {
 }
 
 /**
- * Entrada discreta ao rolar: fade + leve deslocamento vertical.
- * Respeita prefers-reduced-motion (renderiza estático).
+ * Entrada discreta ao rolar, feita apenas com CSS. Assim, o efeito não envia
+ * uma biblioteca de animação para o navegador e o conteúdo continua visível
+ * quando a API de scroll animation não é suportada.
  */
 export function Reveal({ children, delay = 0, className }: RevealProps) {
-  const reduceMotion = useReducedMotion();
-
-  if (reduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
-
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-64px" }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay }}
+    <div
+      className={["reveal", className].filter(Boolean).join(" ")}
+      style={{ "--reveal-delay": `${delay}s` } as CSSProperties}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

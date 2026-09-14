@@ -39,7 +39,6 @@ export const metadata: Metadata = {
   description: siteConfig.seo.description,
   keywords: [...siteConfig.seo.keywords],
   alternates: {
-    // "./" resolve para a rota atual — canonical correto em todas as páginas.
     canonical: "./",
   },
   openGraph: {
@@ -51,8 +50,6 @@ export const metadata: Metadata = {
     description: siteConfig.seo.description,
     images: [
       {
-        // Card 1200x630. O logo quadrado que estava aqui era recortado pelo
-        // formato 1.91:1 do preview.
         url: "/og-default.png",
         width: 1200,
         height: 630,
@@ -69,12 +66,22 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  other: {
+    "geo.region": "BR-SP",
+    "geo.placename": "Votuporanga",
   },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
       { url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
     ],
     apple: "/apple-touch-icon.png",
   },
@@ -97,6 +104,24 @@ const organizationJsonLd = {
   url: siteConfig.url,
   logo: `${siteConfig.url}/images/logo-cifra.jpg`,
   description: siteConfig.shortDescription,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Rua Oscar Adami Sobrinho, 4464",
+    addressLocality: "Votuporanga",
+    addressRegion: "SP",
+    addressCountry: "BR",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: siteConfig.company.phone,
+    contactType: "customer service",
+    areaServed: "BR",
+    availableLanguage: ["Portuguese"],
+  },
+  areaServed: {
+    "@type": "Country",
+    name: "Brasil",
+  },
 };
 
 const websiteJsonLd = {

@@ -1,3 +1,3 @@
-# Cloudflare Pages / Netlify proxy mapping
-# Substitua pela URL de producao da calculadora
-/calculadora/* https://sua-calculadora-hospedada.com/:splat 200
+# Cloudflare Pages / Netlify redirects para a aplicação autenticada.
+/calculadora https://app.cifrainssdeobras.com.br 302
+/calculadora/* https://app.cifrainssdeobras.com.br/:splat 302

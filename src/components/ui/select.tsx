@@ -15,7 +15,7 @@ const Select = React.forwardRef<
       <select
         ref={ref}
         className={cn(
-          "h-12 w-full appearance-none rounded-lg border border-graphite-200 bg-white px-4 pr-10 text-base text-graphite-900 transition-colors focus:border-pine-600 focus:outline-none focus:ring-2 focus:ring-pine-600/20 aria-[invalid=true]:border-red-600 disabled:cursor-not-allowed disabled:bg-cream invalid:text-graphite-400",
+          "h-12 w-full appearance-none rounded-lg border border-graphite-200 bg-white px-4 pr-10 text-base text-graphite-900 transition-colors focus:border-pine-600 focus:outline-none focus:ring-2 focus:ring-pine-600/20 aria-[invalid=true]:border-red-600 disabled:cursor-not-allowed disabled:bg-cream invalid:text-graphite-500",
           className,
         )}
         {...props}

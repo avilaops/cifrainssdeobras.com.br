@@ -39,9 +39,28 @@ export function ServicePageView({ content }: ServicePageViewProps) {
     ],
   };
 
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: content.name,
+    description: content.heroDescription,
+    provider: {
+      "@type": "Organization",
+      name: siteConfig.legalName,
+      url: siteConfig.url,
+    },
+    areaServed: {
+      "@type": "Country",
+      name: "Brasil",
+    },
+    serviceType: "Consultoria Tributária de Obra",
+    url: `${siteConfig.url}/servicos/${content.slug}/`,
+  };
+
   return (
     <>
       <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={serviceJsonLd} />
 
       <PageHeader
         title={content.heroTitle}

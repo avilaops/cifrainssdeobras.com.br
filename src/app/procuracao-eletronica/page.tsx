@@ -3,6 +3,8 @@ import { CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { WhatsAppLink } from "@/components/layout/whatsapp-link";
 import { Button } from "@/components/ui/button";
+import { JsonLd } from "@/components/seo/json-ld";
+import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Procuração Eletrônica RFB",
@@ -13,6 +15,47 @@ export const metadata: Metadata = {
 const CIFRA_CNPJ = "47.772.724/0001-17";
 const PORTAL_URL =
   "https://servicos.receitafederal.gov.br/servico/autorizacoes/minhas-autorizacoes";
+
+const stepsData = [
+  {
+    title: "Acesse o Portal de Serviços da Receita Federal",
+    text: "Abra servicos.receitafederal.gov.br/servico/autorizacoes/minhas-autorizacoes e clique em Entrar com gov.br, informando seu CPF e senha.",
+  },
+  {
+    title: "Abra Minhas Autorizações de Acesso",
+    text: "Na tela inicial, clique no botão + Nova Autorização.",
+  },
+  {
+    title: "Informe os dados da CIFRA",
+    text: `Em Pessoa Autorizada, digite o CNPJ ${CIFRA_CNPJ} e confirme o nome CIFRA — Consultoria Tributária de Obra. Definir validade.`,
+  },
+  {
+    title: "Selecione os serviços autorizados",
+    text: "Clique em Selecionar Serviços e marque os itens do eSocial, SERO, CNO, DCTFWeb e PER/DCOMP.",
+  },
+  {
+    title: "Revise e assine",
+    text: "Clique em Avançar, confira o resumo da autorização e finalize clicando em Assinar com sua conta gov.br.",
+  },
+  {
+    title: "Pronto",
+    text: "A autorização passa a aparecer na aba Concedidas de Minhas Autorizações de Acesso.",
+  },
+];
+
+const howToJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "Como emitir procuração eletrônica para a CIFRA no e-CAC / Receita Federal",
+  description:
+    "Passo a passo simples para autorizar a CIFRA a acessar os sistemas da Receita Federal (SERO, CNO, DCTFWeb) via gov.br.",
+  step: stepsData.map((step, idx) => ({
+    "@type": "HowToStep",
+    position: idx + 1,
+    name: step.title,
+    text: step.text,
+  })),
+};
 
 const steps = [
   {
@@ -110,6 +153,7 @@ const services = [
 export default function ProcuracaoEletronicaPage() {
   return (
     <>
+      <JsonLd data={howToJsonLd} />
       <PageHeader
         title="Como autorizar a CIFRA a acessar seus dados na Receita Federal"
         description="A procuração eletrônica permite que a CIFRA cuide da regularização tributária da sua obra diretamente nos sistemas da Receita Federal, sem burocracia extra para você. Leva menos de 5 minutos."

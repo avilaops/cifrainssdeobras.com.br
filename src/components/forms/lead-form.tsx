@@ -370,7 +370,7 @@ export function LeadForm() {
               aria-describedby={describedBy("area")}
               {...register("area")}
             />
-            <p className="mt-1.5 text-xs text-graphite-400">
+            <p className="mt-1.5 text-xs text-graphite-500">
               Conforme consta no alvará ou no projeto. Se a obra ainda não
               começou, informe a área prevista em Observações.
             </p>
@@ -534,7 +534,7 @@ export function LeadForm() {
               </>
             )}
           </Button>
-          <p className="flex items-center gap-2 text-xs text-graphite-400">
+          <p className="flex items-center gap-2 text-xs text-graphite-500">
             <ShieldCheck aria-hidden="true" className="size-4 shrink-0" />
             Seus dados são usados apenas para este atendimento.
           </p>
