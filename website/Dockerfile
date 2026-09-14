@@ -4,7 +4,7 @@ FROM base AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-COPY next.config.ts tsconfig.json next-env.d.ts postcss.config.mjs ./
+COPY next.config.ts tsconfig.json postcss.config.mjs ./
 COPY public ./public
 COPY src ./src
 # Variável embutida no bundle em build time; vinda como ENV, tem precedência
