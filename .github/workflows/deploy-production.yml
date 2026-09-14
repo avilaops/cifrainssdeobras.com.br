@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: avilaops/infra-observabilidade/.github/workflows/container.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
+    uses: avilaops/infra/.github/workflows/container.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
     with:
       context: calculadora
       dockerfile: calculadora/Dockerfile
@@ -24,7 +24,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: avilaops/infra-observabilidade/.github/workflows/deploy-ssh.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
+    uses: avilaops/infra/.github/workflows/deploy-ssh.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
     with:
       application: app.cifrainssdeobras.com.br
       image: ${{ needs.image.outputs.image }}
@@ -37,7 +37,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: avilaops/infra-observabilidade/.github/workflows/container.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
+    uses: avilaops/infra/.github/workflows/container.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
     with:
       context: website
       build-args: |
@@ -57,7 +57,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: avilaops/infra-observabilidade/.github/workflows/deploy-ssh.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
+    uses: avilaops/infra/.github/workflows/deploy-ssh.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
     with:
       application: cifrainssdeobras.com.br
       image: ${{ needs.website.outputs.image }}
