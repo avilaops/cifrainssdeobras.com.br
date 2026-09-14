@@ -18,3 +18,7 @@ deploy.mjs
 *.log
 *.tsbuildinfo
 .git
+
+**/.env*
+**/node_modules
+**/.next
