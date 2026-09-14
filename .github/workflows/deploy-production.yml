@@ -33,3 +33,28 @@ jobs:
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
       DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
       DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+  website:
+    permissions:
+      contents: read
+      packages: write
+    uses: avilaops/infra-observabilidade/.github/workflows/container.yml@91a1b09899dcd9cd875b76abc78de382e62bbf9e
+    with:
+      context: website
+      dockerfile: website/Dockerfile
+      image-suffix: '-website'
+      publish: ${{ github.event_name != 'pull_request' }}
+  deploy_website:
+    needs: website
+    if: github.event_name != 'pull_request' && vars.DEPLOY_WEBSITE_ENABLED == 'true'
+    permissions:
+      contents: read
+      packages: read
+    uses: avilaops/infra-observabilidade/.github/workflows/deploy-ssh.yml@91a1b09899dcd9cd875b76abc78de382e62bbf9e
+    with:
+      application: cifrainssdeobras.com.br
+      image: ${{ needs.website.outputs.image }}
+    secrets:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_WEBSITE_SSH_KEY }}
+      DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
