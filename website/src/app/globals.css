@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens , CIFRA
+   Paleta: verdes sóbrios (pinho/oliva), off-white quente, grafite e neutros.
+   --------------------------------------------------------------------------- */
+@theme {
+  /* Verde institucional (principal → claro) */
+  --color-pine-950: #161c12;
+  --color-pine-900: #1f2919;
+  --color-pine-800: #293622;
+  --color-pine-700: #35452c;
+  --color-pine-600: #435738;
+  --color-pine-500: #566b47;
+  --color-pine-400: #758860;
+
+  /* Oliva da marca (destaques) */
+  --color-olive-500: #5c6a4a;
+  --color-olive-400: #7c8a68;
+
+  /* Verdes claros de fundo */
+  --color-sage-300: #aab598;
+  --color-sage-200: #cdd5c0;
+  --color-sage-100: #e6ebdd;
+  --color-sage-50: #f1f4ea;
+
+  /* Neutros quentes */
+  --color-paper: #faf9f5;
+  --color-cream: #f4f2ec;
+  --color-graphite-950: #191b16;
+  --color-graphite-900: #23261f;
+  --color-graphite-700: #3d4038;
+  --color-graphite-500: #62655c;
+  --color-graphite-400: #83867d;
+  --color-graphite-200: #d9dad4;
+  --color-graphite-100: #ebece7;
+
+  /* Tipografia */
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), var(--font-manrope), ui-sans-serif,
+    system-ui, sans-serif;
+
+  /* Sombras suaves */
+  --shadow-soft: 0 1px 2px rgb(35 38 31 / 0.05), 0 4px 16px rgb(35 38 31 / 0.06);
+  --shadow-lift: 0 2px 6px rgb(35 38 31 / 0.06), 0 12px 32px rgb(35 38 31 / 0.1);
+  --shadow-panel: 0 24px 64px rgb(22 28 18 / 0.16), 0 4px 16px rgb(22 28 18 / 0.08);
+
+  /* Raio e transições */
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Animação progressiva sem JavaScript; navegadores sem suporte exibem o
+   conteúdo normalmente. */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation-name: reveal-up;
+      animation-duration: 1ms;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-delay: var(--reveal-delay, 0s);
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-graphite-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Âncoras de seção não ficam escondidas atrás do header fixo */
+section[id],
+div[id="formulario"] {
+  scroll-margin-top: 6.5rem;
+}
+
+/* Foco visível consistente para navegação por teclado */
+:focus-visible {
+  outline: 2px solid var(--color-pine-600);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background-color: var(--color-sage-200);
+  color: var(--color-pine-900);
+}
+
+/* Animações do accordion (Radix fornece a altura via CSS var) */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+/* Honeypot: fora da tela para humanos, presente para bots */
+.hp-field {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

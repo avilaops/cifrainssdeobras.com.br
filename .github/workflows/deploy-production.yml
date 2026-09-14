@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: avilaops/infra-observabilidade/.github/workflows/container.yml@5fc768f4ebf631bdcd614b3e87a148dc08dd278f
+    uses: avilaops/infra-observabilidade/.github/workflows/container.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
     with:
       context: calculadora
       dockerfile: calculadora/Dockerfile
@@ -24,7 +24,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: avilaops/infra-observabilidade/.github/workflows/deploy-ssh.yml@5fc768f4ebf631bdcd614b3e87a148dc08dd278f
+    uses: avilaops/infra-observabilidade/.github/workflows/deploy-ssh.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
     with:
       application: app.cifrainssdeobras.com.br
       image: ${{ needs.image.outputs.image }}
@@ -37,9 +37,17 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: avilaops/infra-observabilidade/.github/workflows/container.yml@91a1b09899dcd9cd875b76abc78de382e62bbf9e
+    uses: avilaops/infra-observabilidade/.github/workflows/container.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
     with:
       context: website
+      build-args: |
+        NEXT_PUBLIC_WHATSAPP_NUMBER=${{ vars.NEXT_PUBLIC_WHATSAPP_NUMBER }}
+        NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.NEXT_PUBLIC_CONTACT_EMAIL }}
+        NEXT_PUBLIC_CALCULADORA_URL=${{ vars.NEXT_PUBLIC_CALCULADORA_URL }}
+        NEXT_PUBLIC_TAGFLOW_ENABLED=${{ vars.NEXT_PUBLIC_TAGFLOW_ENABLED }}
+        NEXT_PUBLIC_TAGFLOW_ENDPOINT=${{ vars.NEXT_PUBLIC_TAGFLOW_ENDPOINT }}
+        NEXT_PUBLIC_TAGFLOW_SITE_ID=${{ vars.NEXT_PUBLIC_TAGFLOW_SITE_ID }}
+        NEXT_PUBLIC_TAGFLOW_DEBUG=${{ vars.NEXT_PUBLIC_TAGFLOW_DEBUG }}
       dockerfile: website/Dockerfile
       image-suffix: '-website'
       publish: ${{ github.event_name != 'pull_request' }}
@@ -49,7 +57,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: avilaops/infra-observabilidade/.github/workflows/deploy-ssh.yml@91a1b09899dcd9cd875b76abc78de382e62bbf9e
+    uses: avilaops/infra-observabilidade/.github/workflows/deploy-ssh.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
     with:
       application: cifrainssdeobras.com.br
       image: ${{ needs.website.outputs.image }}

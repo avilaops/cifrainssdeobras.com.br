@@ -1,0 +1,37 @@
+# CIFRA — Consultoria Tributária de Obra
+
+> Especialistas em INSS de Obra, CNO, SERO, Aferição de Obra e Regularização Tributária da Construção Civil em todo o Brasil.
+
+Canonical website: https://cifrainssdeobras.com.br
+Contacto / WhatsApp: +55 17 99743-2052
+Atendimento: Todo o Brasil (Pessoas Físicas e Jurídicas)
+
+## Sobre a CIFRA
+A CIFRA é uma consultoria tributária especializada exclusivamente em construção civil. Auxiliamos proprietários de obras, construtoras, engenheiros e arquitetos na economia legal e regularização do INSS sobre obras de construção civil junto à Receita Federal do Brasil.
+
+## Principais Serviços
+
+### 1. Consultoria e Redução de INSS de Obra
+- [INSS de Obra](https://cifrainssdeobras.com.br/servicos/inss-de-obra/): Análise técnica detalhada da memória de cálculo do INSS da construção, identificando benefícios legais, abatimentos de mão de obra e deduções permitidas pela legislação vigente.
+
+### 2. SERO — Serviço Eletrônico para Aferição de Obras
+- [SERO](https://cifrainssdeobras.com.br/servicos/sero/): Processamento da aferição de obra no sistema SERO da Receita Federal. Realizamos a conferência dos dados da obra, inserção de créditos e emissão do VSO (Valor da Sombra de Obra) otimizado para gerar a CND da obra com o menor custo tributário possível.
+
+### 3. CNO — Cadastro Nacional de Obras
+- [CNO](https://cifrainssdeobras.com.br/servicos/cno/): Abertura, alteração, vinculação e encerramento de CNO perante a Receita Federal. Correção de pendências cadastrais que impedem a certidão negativa.
+
+### 4. Aferição e Regularização de Obras
+- [Aferição de Obra](https://cifrainssdeobras.com.br/servicos/afericao-de-obra/): Diagnóstico da aferição indireta da obra (área construída, destinação, tipo de construção, notas fiscais de empreiteira e concreto preparado) para evitar pagamentos indevidos de contribuição previdenciária.
+
+### 5. Planejamento Tributário de Construção Civil
+- [Planejamento Tributário](https://cifrainssdeobras.com.br/servicos/planejamento-tributario/): Estratégias preventivas e simultâneas à execução da obra para aproveitamento de créditos de eSocial, DCTFWeb e faturamento de terceiros.
+
+### 6. Procuração Eletrônica e-CAC
+- [Procuração Eletrônica](https://cifrainssdeobras.com.br/procuracao-eletronica/): Guia passo a passo para conceder autorização à CIFRA no portal e-CAC / gov.br (CNPJ CIFRA: 47.772.724/0001-17), liberando a atuação nos sistemas eSocial, DCTFWeb, SERO e CNO sem burocracia.
+
+## Ferramentas e Recursos
+- [Calculadora de INSS de Obra](https://app.cifrainssdeobras.com.br): Simulação instantânea da estimativa de INSS de obra e do potencial de economia.
+- [Sitemap Oficial](https://cifrainssdeobras.com.br/sitemap.xml): Mapeamento canônico de todas as páginas públicas do site.
+
+## Termos Técnicos e Palavras-chave de Autoridade
+INSS de obra, SERO, CNO, DISO, Aferição Indireta, CND de Obra, Habite-se, Receita Federal, e-CAC, DCTFWeb, Memória de Cálculo de Obra, Fator R, Regularização de Construção Residencial e Comercial.
