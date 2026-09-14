@@ -18,6 +18,15 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+.env.*
+!.env.example
+!.env.*.example
+
+# Pacotes temporarios de deploy.
+*.tar.gz
+
+# Clone local legado do mesmo repositorio; evita referencia Git circular.
+/website/
 
 # typescript
 *.tsbuildinfo

@@ -1,4 +1,4 @@
-# Relatório de Auditoria Técnica de Arquitetura — Projeto CIFRA (Versão Consolidada)
+# Relatório de Auditoria Técnica de Arquitetura: Projeto CIFRA (Versão Consolidada)
 
 **Data da Auditoria:** 04 de Agosto de 2026  
 **Status do Projeto:** Auditado e verificado via banco de dados local e remoto Hetzner  
@@ -26,7 +26,7 @@ A auditoria realizou a verificação direta de conexão e esquema nos bancos de 
   * Tabelas Existentes (9 tabelas): `clientes`, `obras`, `simulacoes`, `auditorias`, `vau_mensal`, `parametros_impostos`, `regra_reducao_irpf`, `tabela_inss`, `tabela_irpf`.
   * Estado: Todas as 4 migrations do repositório foram aplicadas com sucesso + tabelas de suporte tributário criadas.
 
-* **Banco de Produção Hetzner (`178.105.82.48` — Container `cifra-cifra-db-1`):**
+* **Banco de Produção Hetzner (`178.105.82.48` - Container `cifra-cifra-db-1`):**
   * Status: **ONLINE** (Container PostgreSQL 16 `cifra-cifra-db-1` rodando no docker do servidor Hetzner).
   * Tabelas Existentes (4 tabelas ativas): `clientes`, `obras`, `simulacoes`, `auditorias`.
   * Diagnóstico: O banco de dados em produção está funcional e ativo com os dados do CRM e simulações, pronto para receber o `prisma migrate deploy` com as migrations mais recentes de regras tributárias.
@@ -128,7 +128,7 @@ graph TD
 | `CIFRA/postcss.config.mjs` | Arquivo | `website` (Sombra) | **SIM (Indevido)** | Configuração Tailwind CSS | Duplicado com `website/postcss.config.mjs` | **REMOVER** |
 | `CIFRA/src/` | Diretório | `website` (Sombra) | **SIM (Indevido)** | 74 arquivos TSX/TS idênticos | Duplicado exato de `website/src/` | **REMOVER** |
 | `CIFRA/public/` | Diretório | `website` (Sombra) | **SIM (Indevido)** | Assets do site institucional | Duplicado com `website/public/` | **REMOVER** |
-| `CIFRA/.env` | Arquivo | Raiz / Global | **SIM (Perigoso)** | Contém tokens e senhas reais | Variações espalhadas | **REORGANIZAR em .env.example, .env.local, .env.production** |
+| `CIFRA/.env` | Arquivo | Raiz / Global | **SIM (Perigoso)** | Contém tokens e senhas reais | Variações espalhadas | **REORGANIZAR em .env.example .env.local .env.production** |
 | `CIFRA/website/package.json` | Arquivo | `website` | **SIM (Legítimo)** | Nome: `cifra-website` | Nenhuma | **MANTER** |
 | `CIFRA/website/next.config.ts` | Arquivo | `website` | **SIM (Legítimo)** | Contém `rewrites()` legado | Nenhuma | **MANTER** (Remover `rewrites()`) |
 | `CIFRA/website/src/` | Diretório | `website` | **SIM (Legítimo)** | Código-fonte da landing page | Nenhuma | **MANTER** |
@@ -169,11 +169,11 @@ Identificamos todos os arquivos do projeto que contêm referências incorretas a
 
 ## 7. Classificação dos Problemas Identificados (P0 a P4)
 
-### Priority 0 (P0) — Bloqueio / Risco Extremo de Segurança
+### Priority 0 (P0): Bloqueio / Risco Extremo de Segurança
 * **[P0-1] Exposição de Credenciais no `.env` da Raiz:** O arquivo `.env` na raiz contém tokens ativos do Cloudflare, GitHub, Facebook Pixel, Google Cloud e senhas de admin.
 * **[P0-2] Conflito de Aplicação na Raiz (`CIFRA/src`):** Existência de um projeto Next.js completo na raiz competindo com o `website/`.
 
-### Priority 1 (P1) — Risco Alto de Instabilidade / Configuração Incorreta
+### Priority 1 (P1): Risco Alto de Instabilidade / Configuração Incorreta
 * **[P1-1] Presença de Proxy Rewrite Legado `/calculadora`:** Configurações no `website/next.config.ts`, `docker-compose.yml` e scripts tentam fazer proxy em subcaminho, violando a regra de domínios independentes.
 * **[P1-2] Arquivos `.env` Desorganizados e Duplicados:** Existência de `.env`, `.env.local`, `.env.production` e `.env.example` sem padrão definido entre raiz, website e calculadora.
 * **[P1-3] Arquivos Compactados Gigantes no Repositório:** O arquivo `calculadora/deploy.zip` (535 MB) inflando o workspace.
@@ -182,33 +182,33 @@ Identificamos todos os arquivos do projeto que contêm referências incorretas a
 
 ## 8. Plano de Correção em Fases
 
-### Fase 0 — Backup, Reorganização dos `.env` e Baseline
+### Fase 0: Backup, Reorganização dos `.env` e Baseline
 1. Fazer backup de segurança completo fora do diretório de trabalho.
 2. Reorganizar os arquivos `.env` de todas as aplicações para usar **estritamente 3 arquivos por projeto**:
    * `.env.example` (Template no Git)
-   * `.env.local` (Dev Local — Ignorado no Git)
-   * `.env.production` (Produção Hetzner — Ignorado no Git)
+   * `.env.local` (Dev Local, Ignorado no Git)
+   * `.env.production` (Produção Hetzner, Ignorado no Git)
 3. Remover credenciais expostas do `.env` da raiz e guardar segredos reais no gerenciador de senhas.
 
-### Fase 1 — Eliminação da Aplicação Sombra na Raiz
+### Fase 1: Eliminação da Aplicação Sombra na Raiz
 1. Confirmar que 100% das páginas e assets de `CIFRA/src/` estão em `website/src/`.
 2. Remover os arquivos de aplicação Next.js da raiz (`CIFRA/src/`, `CIFRA/next.config.ts`, `CIFRA/package.json`, `CIFRA/package-lock.json`, `CIFRA/postcss.config.mjs`, `CIFRA/tsconfig.json`, `CIFRA/public/`).
 
-### Fase 2 — Remoção das Regras Legadas de Proxy `/calculadora`
+### Fase 2: Remoção das Regras Legadas de Proxy `/calculadora`
 1. Atualizar `website/next.config.ts` removendo o bloco `rewrites()` e a variável `CALCULADORA_PROXY_URL`.
 2. Atualizar `website/src/config/site.ts` definindo `calculatorUrl: "https://app.cifrainssdeobras.com"`.
 3. Ajustar `docker-compose.yml` e `website/Dockerfile` removendo referências de proxy.
 4. Corrigir `cifra.nginx` com o domínio exato `app.cifrainssdeobras.com`.
 5. Atualizar `scripts/start-integrated.ps1` sem a flag `NEXT_PUBLIC_BASE_PATH=/calculadora`.
 
-### Fase 3 — Limpeza de Componentes Copiados e Artefatos Pesados
+### Fase 3: Limpeza de Componentes Copiados e Artefatos Pesados
 1. Remover de `calculadora/src/components/` os componentes institucionais públicos.
 2. Excluir os arquivos zip pesados (`calculadora/deploy.zip`, `calculadora/source.zip`, `deploy.tar.gz`).
 
-### Fase 4 — Padronização dos Motores de Cálculo
+### Fase 4: Padronização dos Motores de Cálculo
 1. Mover `calculadora/src/app/calculadora-reducao-irpf/logic.ts` para `calculadora/src/lib/calc/irpf.ts`.
 
-### Fase 5 — Validação de Build, Banco de Dados e Homologação
+### Fase 5: Validação de Build, Banco de Dados e Homologação
 1. Testar build independente de `website/` (`cifrainssdeobras.com.br`).
 2. Testar build e testes unitários de `calculadora/` (`app.cifrainssdeobras.com`).
 3. Validar a execução de `npx prisma migrate deploy` no container de produção `cifra-cifra-db-1`.
@@ -218,7 +218,7 @@ Identificamos todos os arquivos do projeto que contêm referências incorretas a
 ## 9. Resposta aos Critérios de Aceite
 
 1. **Os bancos de dados local e de produção foram acessados e checados?**
-   * **SIM.** O banco local (`localhost:5432`) possui 9 tabelas ativas. O banco de produção no servidor Hetzner (`178.105.82.48` — container `cifra-cifra-db-1`) foi acessado via SSH/Docker Exec e está **ONLINE** com 4 tabelas ativas (`clientes`, `obras`, `simulacoes`, `auditorias`).
+   * **SIM.** O banco local (`localhost:5432`) possui 9 tabelas ativas. O banco de produção no servidor Hetzner (`178.105.82.48` - container `cifra-cifra-db-1`) foi acessado via SSH/Docker Exec e está **ONLINE** com 4 tabelas ativas (`clientes`, `obras`, `simulacoes`, `auditorias`).
 2. **Como os arquivos `.env` serão organizados?**
    * **Padronizados em exatamente 3 arquivos por projeto**: `.env.example`, `.env.local` e `.env.production`.
 3. **Existe proxy ou subcaminho `/calculadora`?**

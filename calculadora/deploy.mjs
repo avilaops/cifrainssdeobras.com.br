@@ -1,16 +1,16 @@
 // Deploy do app "calculadora" para a VPS de produção.
 //
-// A pasta /opt/cifra na VPS NÃO é um repositório git (não dá pra usar
-// `git pull`) — o código é sincronizado por tarball via SFTP. Este script:
-//   1. empacota calculadora/ localmente (sem node_modules, .next, .env* etc.)
-//   2. envia o tarball por SFTP autenticado com chave SSH
-//   3. extrai na VPS (sem sobrescrever os .env de produção, que ficam fora
-//      do pacote)
-//   4. reconstrói e reinicia o container cifra-calculadora
-//   5. confere /api/health
+// Desde 04/09/2026 a imagem é construída AQUI (Docker local, linux/amd64) e
+// publicada no GHCR; a VPS só faz pull e sobe. Antes o build rodava na VPS
+// (RAM em swap) e levava 10 a 12 min. Este script:
+//   1. docker build da pasta calculadora/ com a tag do commit atual
+//   2. docker push para ghcr.io/avilaops/cifra-calculadora (:<sha> e :latest)
+//   3. na VPS: docker login no GHCR (GITHUB_TOKEN do tokens.env), pull,
+//      compose up -d do serviço e /api/health com espera de até 60 s
 //
 // Uso: node deploy.mjs
-// Requer a chave privada em SSH_KEY_PATH (ou o padrão abaixo).
+// Requer: Docker local logado no ghcr.io (docker login ghcr.io -u avilaops)
+// e a chave privada em SSH_KEY_PATH (ou o padrão abaixo).
 
 import { Client } from "ssh2";
 import { execSync } from "node:child_process";
@@ -23,38 +23,25 @@ const USERNAME = process.env.DEPLOY_USER || "root";
 const SSH_KEY_PATH =
   process.env.SSH_KEY_PATH || path.join(os.homedir(), ".ssh", "hetzner_avilaops");
 const REMOTE_DIR = "/opt/cifra";
-const REMOTE_TARBALL = `${REMOTE_DIR}/deploy.tar.gz`;
+const IMAGE = "ghcr.io/avilaops/cifra-calculadora";
 const LOCAL_ROOT = path.resolve(import.meta.dirname); // .../calculadora
-const REPO_ROOT = path.dirname(LOCAL_ROOT);
-// Nome relativo (sem letra de drive) — o `tar` do Git Bash lê "C:\..." como
-// "host:arquivo" (sintaxe de tar remoto) e falha. Rodamos com cwd=REPO_ROOT.
-const TARBALL_NAME = `_deploy-${Date.now()}.tar.gz`;
-const LOCAL_TARBALL = path.join(REPO_ROOT, TARBALL_NAME);
 
-const TAR_EXCLUDES = [
-  "node_modules",
-  ".next",
-  "out",
-  "coverage",
-  ".env",
-  ".env.local",
-  ".env.production",
-  "*.tsbuildinfo",
-  "*.log",
-];
+function sh(cmd, label) {
+  console.log(`\n--- ${label} ---\n$ ${cmd}`);
+  execSync(cmd, { stdio: "inherit", cwd: LOCAL_ROOT });
+}
 
-function buildTarball() {
-  console.log("Empacotando calculadora/ ...");
+function buildAndPush() {
   if (!fs.existsSync(SSH_KEY_PATH)) {
     throw new Error(`Chave SSH não encontrada em ${SSH_KEY_PATH}. Defina SSH_KEY_PATH.`);
   }
-  const excludeArgs = TAR_EXCLUDES.map((p) => `--exclude=${p}`).join(" ");
-  execSync(`tar czf "${TARBALL_NAME}" ${excludeArgs} calculadora`, {
-    stdio: "inherit",
-    cwd: REPO_ROOT,
-  });
-  const { size } = fs.statSync(LOCAL_TARBALL);
-  console.log(`Tarball criado: ${LOCAL_TARBALL} (${(size / 1024 / 1024).toFixed(2)} MB)`);
+  const sha = execSync("git rev-parse --short HEAD", { cwd: LOCAL_ROOT }).toString().trim();
+  const dirty = execSync("git status --porcelain -- .", { cwd: LOCAL_ROOT }).toString().trim();
+  if (dirty) console.warn("\nAtenção: há alterações não commitadas em calculadora/. A imagem leva o que está na árvore.");
+  sh(`docker build --platform linux/amd64 -t ${IMAGE}:${sha} -t ${IMAGE}:latest .`, `Build da imagem (${sha})`);
+  sh(`docker push ${IMAGE}:${sha}`, "Push :sha");
+  sh(`docker push ${IMAGE}:latest`, "Push :latest");
+  return sha;
 }
 
 function connect() {
@@ -70,20 +57,6 @@ function connect() {
         privateKey: fs.readFileSync(SSH_KEY_PATH),
         readyTimeout: 30000,
       });
-  });
-}
-
-function uploadTarball(conn) {
-  return new Promise((resolve, reject) => {
-    conn.sftp((err, sftp) => {
-      if (err) return reject(err);
-      console.log(`Enviando tarball para ${REMOTE_TARBALL} ...`);
-      sftp.fastPut(LOCAL_TARBALL, REMOTE_TARBALL, (err) => {
-        if (err) return reject(err);
-        console.log("Upload concluído.");
-        resolve();
-      });
-    });
   });
 }
 
@@ -108,45 +81,42 @@ function exec(conn, cmd, label) {
 }
 
 async function main() {
-  buildTarball();
+  const sha = buildAndPush();
 
   const conn = await connect();
-  console.log("Conectado à VPS.");
+  console.log("\nConectado à VPS.");
 
   try {
-    await uploadTarball(conn);
-
-    // Extrai apenas por cima da pasta calculadora/ (o tarball já tem esse prefixo).
-    // .env* ficam de fora do pacote, então nunca são tocados aqui.
+    // O token fica só na VPS (/etc/avilaops/tokens.env); o arquivo tem linhas
+    // com CRLF, por isso o grep/tr em vez de "source".
     await exec(
       conn,
-      `cd "${REMOTE_DIR}" && tar xzf deploy.tar.gz && rm -f deploy.tar.gz`,
-      "Extraindo na VPS",
+      `tok=$(grep -E '^GITHUB_TOKEN=' /etc/avilaops/tokens.env | cut -d= -f2- | tr -d '\\r"'); ` +
+        `[ -n "$tok" ] || { echo "GITHUB_TOKEN ausente no tokens.env"; exit 1; }; ` +
+        `echo "$tok" | docker login ghcr.io -u avilaops --password-stdin`,
+      "Login no GHCR",
     );
 
-    await exec(
-      conn,
-      `cd "${REMOTE_DIR}" && docker compose build cifra-calculadora`,
-      "Build da imagem Docker",
-    );
+    await exec(conn, `docker pull ${IMAGE}:${sha} && docker tag ${IMAGE}:${sha} ${IMAGE}:latest`, `Pull da imagem ${sha}`);
 
     await exec(
       conn,
-      `cd "${REMOTE_DIR}" && docker compose up -d cifra-calculadora`,
+      `cd "${REMOTE_DIR}" && docker compose up -d --no-build cifra-calculadora`,
       "Subindo o container",
     );
 
-    // O Next leva alguns segundos para abrir a porta depois do "Started";
-    // 3 s fixos davam "Connection refused" com o container saudável.
+    // O Next leva alguns segundos para abrir a porta depois do "Started".
     const health = await exec(
       conn,
       `for i in $(seq 1 20); do out=$(docker exec cifra-cifra-calculadora-1 wget -qO- http://localhost:3000/api/health 2>/dev/null) && { echo "$out"; exit 0; }; sleep 3; done; echo "sem resposta em 60 s"; exit 1`,
       "Health check (até 60 s)",
     );
-    console.log("\nDeploy concluído. Health:", health.trim());
+
+    await exec(conn, `docker image prune -f >/dev/null 2>&1 || true`, "Limpando imagens antigas");
+
+    console.log(`\nDeploy concluído (${sha}). Health:`, health.trim());
   } finally {
     conn.end();
-    fs.rmSync(LOCAL_TARBALL, { force: true });
   }
 }
 

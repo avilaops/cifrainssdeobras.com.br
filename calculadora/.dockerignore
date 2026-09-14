@@ -1,0 +1,20 @@
+# A imagem não leva dependências nem build local; o Dockerfile refaz os dois.
+node_modules
+.next
+out
+coverage
+
+# Segredos e configuração de ambiente ficam fora da imagem: em produção
+# tudo vem do docker-compose (environment) na VPS.
+.env
+.env.*
+!.env.example
+
+# Scripts avulsos e material de referência que não entram no app
+fetch_*.js
+fetch_*.mjs
+reference
+deploy.mjs
+*.log
+*.tsbuildinfo
+.git

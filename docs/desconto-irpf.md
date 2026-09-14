@@ -148,11 +148,11 @@ e escolher a alternativa mais vantajosa.
 
 Também mudaria o título para:
 
-> **Calculadora de redução do IRPF — Lei nº 15.270/2025**
+> **Calculadora de redução do IRPF, Lei nº 15.270/2025**
 
 “Desconto IRPF” pode dar a impressão de que qualquer despesa informada diminui diretamente o imposto, o que não é correto.
 
-[1]: https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/tabelas/2026?utm_source=chatgpt.com "Tributação de 2026 — Receita Federal - Portal Gov.br"
+[1]: https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/tabelas/2026?utm_source=chatgpt.com "Tributação de 2026, Receita Federal - Portal Gov.br"
 
 Para o cálculo **anual**, os dois modelos mudam somente a forma de determinar a **base tributável**. Depois disso, a tabela progressiva anual e a redução da Lei nº 15.270/2025 são aplicadas da mesma forma.
 
@@ -369,6 +369,6 @@ Economia estimada:            R$ Z
 
 Essa comparação automática é mais segura e replica a lógica do programa da declaração da Receita, que compara as duas formas de tributação. ([Serviços e Informações do Brasil][3])
 
-[1]: https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/tabelas/2026 "Tributação de 2026 — Receita Federal"
+[1]: https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/tabelas/2026 "Tributação de 2026, Receita Federal"
 [2]: https://www.planalto.gov.br/ccivil_03/leis/l9250.htm "L9250"
-[3]: https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/preenchimento/manual-mir/resumo?utm_source=chatgpt.com "Resumo — Receita Federal - Portal Gov.br"
+[3]: https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/preenchimento/manual-mir/resumo?utm_source=chatgpt.com "Resumo, Receita Federal - Portal Gov.br"
