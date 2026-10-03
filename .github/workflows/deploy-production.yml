@@ -7,12 +7,15 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   image:
     permissions:
       contents: read
       packages: write
-    uses: avilaops/infra/.github/workflows/container.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
+    uses: avilaops/infra/.github/workflows/container.yml@5e560f44062c8e025ddcfd86197e5394b562deae
     with:
       context: calculadora
       dockerfile: calculadora/Dockerfile
@@ -24,7 +27,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: avilaops/infra/.github/workflows/deploy-ssh.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
+    uses: avilaops/infra/.github/workflows/deploy-ssh.yml@5e560f44062c8e025ddcfd86197e5394b562deae
     with:
       application: app.cifrainssdeobras.com.br
       image: ${{ needs.image.outputs.image }}
@@ -37,7 +40,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: avilaops/infra/.github/workflows/container.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
+    uses: avilaops/infra/.github/workflows/container.yml@5e560f44062c8e025ddcfd86197e5394b562deae
     with:
       context: website
       build-args: |
@@ -57,7 +60,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: avilaops/infra/.github/workflows/deploy-ssh.yml@bf985921d9964317eb2da588b4645e1275b7e9fc
+    uses: avilaops/infra/.github/workflows/deploy-ssh.yml@5e560f44062c8e025ddcfd86197e5394b562deae
     with:
       application: cifrainssdeobras.com.br
       image: ${{ needs.website.outputs.image }}
