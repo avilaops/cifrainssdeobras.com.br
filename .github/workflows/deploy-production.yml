@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: avilaops/infra/.github/workflows/container.yml@5e560f44062c8e025ddcfd86197e5394b562deae
+    uses: ./.github/workflows/container.yml
     with:
       context: calculadora
       dockerfile: calculadora/Dockerfile
@@ -27,7 +27,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: avilaops/infra/.github/workflows/deploy-ssh.yml@5e560f44062c8e025ddcfd86197e5394b562deae
+    uses: ./.github/workflows/deploy-ssh.yml
     with:
       application: app.cifrainssdeobras.com.br
       image: ${{ needs.image.outputs.image }}
