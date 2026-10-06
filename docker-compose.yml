@@ -24,20 +24,5 @@ services:
     depends_on:
       - cifra-db
 
-  cifra-website:
-    build:
-      context: ./website
-      dockerfile: Dockerfile
-      args:
-        # NEXT_PUBLIC_* é embutido no bundle em tempo de BUILD — precisa ser
-        # build arg; "environment:" em runtime não tem efeito sobre ele.
-        NEXT_PUBLIC_CALCULADORA_URL: "https://app.cifrainssdeobras.com.br"
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:3010:3000" # Expondo para o Nginx na VPS (cifrainssdeobras.com.br)
-    environment:
-      NEXT_PUBLIC_CALCULADORA_URL: "https://app.cifrainssdeobras.com.br"
-      NEXT_PUBLIC_BASE_PATH: ""
-
 volumes:
   cifra-pgdata:

@@ -1,4 +1,4 @@
-name: Build e deploy
+name: Build e deploy (calculadora)
 on:
   push:
     branches: [main]
@@ -35,37 +35,4 @@ jobs:
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
       DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-      DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
-  website:
-    permissions:
-      contents: read
-      packages: write
-    uses: avilaops/infra/.github/workflows/container.yml@5e560f44062c8e025ddcfd86197e5394b562deae
-    with:
-      context: website
-      build-args: |
-        NEXT_PUBLIC_WHATSAPP_NUMBER=${{ vars.NEXT_PUBLIC_WHATSAPP_NUMBER }}
-        NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.NEXT_PUBLIC_CONTACT_EMAIL }}
-        NEXT_PUBLIC_CALCULADORA_URL=${{ vars.NEXT_PUBLIC_CALCULADORA_URL }}
-        NEXT_PUBLIC_TAGFLOW_ENABLED=${{ vars.NEXT_PUBLIC_TAGFLOW_ENABLED }}
-        NEXT_PUBLIC_TAGFLOW_ENDPOINT=${{ vars.NEXT_PUBLIC_TAGFLOW_ENDPOINT }}
-        NEXT_PUBLIC_TAGFLOW_SITE_ID=${{ vars.NEXT_PUBLIC_TAGFLOW_SITE_ID }}
-        NEXT_PUBLIC_TAGFLOW_DEBUG=${{ vars.NEXT_PUBLIC_TAGFLOW_DEBUG }}
-      dockerfile: website/Dockerfile
-      image-suffix: '-website'
-      publish: ${{ github.event_name != 'pull_request' }}
-  deploy_website:
-    needs: website
-    if: github.event_name != 'pull_request' && vars.DEPLOY_WEBSITE_ENABLED == 'true'
-    permissions:
-      contents: read
-      packages: read
-    uses: avilaops/infra/.github/workflows/deploy-ssh.yml@5e560f44062c8e025ddcfd86197e5394b562deae
-    with:
-      application: cifrainssdeobras.com.br
-      image: ${{ needs.website.outputs.image }}
-    secrets:
-      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_WEBSITE_SSH_KEY }}
       DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
