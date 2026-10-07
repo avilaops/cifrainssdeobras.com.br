@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: cifra
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-cifra_secret_password}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD}
       POSTGRES_DB: cifra_calculadora
     volumes:
       - cifra-pgdata:/var/lib/postgresql/data
@@ -17,7 +17,7 @@ services:
     ports:
       - "127.0.0.1:3011:3000"
     environment:
-      DATABASE_URL: "postgresql://cifra:${DB_PASSWORD:-cifra_secret_password}@cifra-db:5432/cifra_calculadora?schema=public"
+      DATABASE_URL: "postgresql://cifra:${DB_PASSWORD:?defina DB_PASSWORD}@cifra-db:5432/cifra_calculadora?schema=public"
       NEXT_PUBLIC_BASE_PATH: ""
       CALCULADORA_ADMIN_USER: ${CALCULADORA_ADMIN_USER}
       CALCULADORA_ADMIN_PASSWORD: ${CALCULADORA_ADMIN_PASSWORD}
