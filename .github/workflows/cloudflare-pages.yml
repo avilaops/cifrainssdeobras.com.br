@@ -23,6 +23,14 @@ jobs:
           node-version: 24
       - name: Build public site
         working-directory: website
+        env:
+          NEXT_PUBLIC_WHATSAPP_NUMBER: ${{ vars.NEXT_PUBLIC_WHATSAPP_NUMBER }}
+          NEXT_PUBLIC_CONTACT_EMAIL: ${{ vars.NEXT_PUBLIC_CONTACT_EMAIL }}
+          NEXT_PUBLIC_CALCULADORA_URL: ${{ vars.NEXT_PUBLIC_CALCULADORA_URL }}
+          NEXT_PUBLIC_TAGFLOW_ENABLED: ${{ vars.NEXT_PUBLIC_TAGFLOW_ENABLED }}
+          NEXT_PUBLIC_TAGFLOW_ENDPOINT: ${{ vars.NEXT_PUBLIC_TAGFLOW_ENDPOINT }}
+          NEXT_PUBLIC_TAGFLOW_SITE_ID: ${{ vars.NEXT_PUBLIC_TAGFLOW_SITE_ID }}
+          NEXT_PUBLIC_TAGFLOW_DEBUG: ${{ vars.NEXT_PUBLIC_TAGFLOW_DEBUG }}
         run: |
           npm ci
           npm run build
