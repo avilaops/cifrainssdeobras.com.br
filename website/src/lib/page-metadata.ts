@@ -8,7 +8,7 @@ export function pageMetadata({ path, title, description }: {
   description: string;
 }): Metadata {
   const url = new URL(path, siteConfig.url).href;
-  const previewTitle = `${title} | ${siteConfig.name}`;
+  const previewTitle = `${title} • ${siteConfig.name}`;
   return {
     title,
     description,
