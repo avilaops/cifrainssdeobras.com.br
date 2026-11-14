@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import {
   Calculator,
   ClipboardCheck,
@@ -12,11 +13,12 @@ import { WhatsAppLink } from "@/components/layout/whatsapp-link";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/parceiros/",
   title: "Parceria para Arquitetos, Engenheiros e Contadores",
   description:
     "Indique a parte tributária da obra para a CIFRA e entregue um serviço mais completo ao seu cliente, sem sair do seu escopo.",
-};
+});
 
 const partners = [
   {

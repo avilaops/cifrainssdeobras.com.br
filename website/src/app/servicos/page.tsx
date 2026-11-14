@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,11 +8,12 @@ import { WhatsAppLink } from "@/components/layout/whatsapp-link";
 import { ServicesCards } from "@/components/sections/services-cards";
 import { Reveal } from "@/components/motion/reveal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/servicos/",
   title: "Serviços",
   description:
     "Conheça os serviços da CIFRA: análise de INSS de obra, CNO, SERO, aferição, planejamento tributário, revisão de cálculos e regularização completa.",
-};
+});
 
 export default function ServicosPage() {
   return (

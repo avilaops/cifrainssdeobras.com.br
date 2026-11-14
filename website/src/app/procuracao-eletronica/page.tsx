@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import { CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { WhatsAppLink } from "@/components/layout/whatsapp-link";
@@ -6,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/config/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/procuracao-eletronica/",
   title: "Procuração Eletrônica RFB",
   description:
     "Passo a passo para autorizar a CIFRA a acessar os sistemas da Receita Federal em seu nome, pelo gov.br.",
-};
+});
 
 const CIFRA_CNPJ = "47.772.724/0001-17";
 const PORTAL_URL =

@@ -15,6 +15,7 @@ import { FinalCta } from "@/components/sections/final-cta";
 const professionalServiceJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
+  "@id": `${siteConfig.url}/#organizacao`,
   name: siteConfig.legalName,
   url: siteConfig.url,
   description: siteConfig.seo.description,

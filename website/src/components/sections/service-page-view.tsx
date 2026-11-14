@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Check, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/config/site";
-import type { ServicePageContent } from "@/config/service-pages";
+import { servicePages, type ServicePageContent } from "@/config/service-pages";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/page-header";
 import { WhatsAppLink } from "@/components/layout/whatsapp-link";
@@ -14,6 +14,11 @@ interface ServicePageViewProps {
 
 /** Template das páginas de detalhe de serviço. */
 export function ServicePageView({ content }: ServicePageViewProps) {
+  const related = servicePages.filter((page) => page.slug !== content.slug);
+  const sources = content.sources ?? [
+    { label: "Receita Federal: Cadastro Nacional de Obras", href: "https://www.gov.br/receitafederal/pt-br/assuntos/construcao-civil/cno" },
+    { label: "Receita Federal: aferição de obras no SERO", href: "https://www.gov.br/receitafederal/pt-br/assuntos/construcao-civil/sero" },
+  ];
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -42,10 +47,12 @@ export function ServicePageView({ content }: ServicePageViewProps) {
   const serviceJsonLd = {
     "@context": "https://schema.org",
     "@type": "Service",
+    "@id": `${siteConfig.url}/servicos/${content.slug}/#servico`,
     name: content.name,
     description: content.heroDescription,
     provider: {
       "@type": "Organization",
+      "@id": `${siteConfig.url}/#organizacao`,
       name: siteConfig.legalName,
       url: siteConfig.url,
     },
@@ -61,6 +68,16 @@ export function ServicePageView({ content }: ServicePageViewProps) {
     <>
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={serviceJsonLd} />
+      {content.faq && (
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: content.faq.map((item) => ({
+            "@type": "Question", name: item.question,
+            acceptedAnswer: { "@type": "Answer", text: item.answer },
+          })),
+        }} />
+      )}
 
       <PageHeader
         title={content.heroTitle}
@@ -90,6 +107,48 @@ export function ServicePageView({ content }: ServicePageViewProps) {
                 ))}
               </Reveal>
             ))}
+            {content.steps && (
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight text-graphite-900 sm:text-3xl">
+                  Como fazer a aferição da obra, passo a passo
+                </h2>
+                <ol className="mt-6 space-y-6">
+                  {content.steps.map((step, index) => (
+                    <li key={step.title}>
+                      <h3 className="font-bold text-graphite-900">{index + 1}. {step.title}</h3>
+                      <p className="mt-2 leading-relaxed text-graphite-700">{step.description}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+            {content.faq && (
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight text-graphite-900 sm:text-3xl">
+                  Dúvidas sobre a aferição de obra
+                </h2>
+                <div className="mt-6 divide-y divide-graphite-100 rounded-xl border border-graphite-100 bg-white px-5">
+                  {content.faq.map((item) => (
+                    <details key={item.question} className="py-4">
+                      <summary className="cursor-pointer font-bold text-graphite-900">{item.question}</summary>
+                      <p className="mt-3 leading-relaxed text-graphite-700">{item.answer}</p>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div>
+              <h2 className="text-xl font-bold text-graphite-900">Referências oficiais</h2>
+              <ul className="mt-4 space-y-3">
+                {sources.map((source) => (
+                  <li key={source.href}>
+                    <a href={source.href} target="_blank" rel="noopener noreferrer" className="text-pine-700 underline underline-offset-4">
+                      {source.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <aside className="lg:pt-2">
@@ -127,6 +186,21 @@ export function ServicePageView({ content }: ServicePageViewProps) {
               </div>
             </Reveal>
           </aside>
+        </div>
+      </section>
+
+      <section className="border-t border-graphite-100 bg-paper py-12">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 className="text-2xl font-bold text-graphite-900">Serviços relacionados à regularização</h2>
+          <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+            {related.map((page) => (
+              <li key={page.slug}>
+                <a href={`/servicos/${page.slug}/`} className="font-semibold text-pine-700 underline underline-offset-4">
+                  {page.name}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

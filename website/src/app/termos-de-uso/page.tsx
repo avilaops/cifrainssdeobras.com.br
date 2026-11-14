@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
 import { siteConfig } from "@/config/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/termos-de-uso/",
   title: "Termos de Uso",
   description:
     "Condições de uso do site da CIFRA , Consultoria Tributária de Obra.",
-};
+});
 
 export default function TermosDeUsoPage() {
   return (
