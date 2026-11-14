@@ -104,6 +104,7 @@ const organizationJsonLd = {
   name: siteConfig.legalName,
   url: siteConfig.url,
   logo: `${siteConfig.url}/images/logo-cifra.jpg`,
+  image: `${siteConfig.url}/images/logo-cifra.jpg`,
   description: siteConfig.shortDescription,
   address: {
     "@type": "PostalAddress",
