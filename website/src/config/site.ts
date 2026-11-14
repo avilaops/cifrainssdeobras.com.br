@@ -18,7 +18,7 @@ export const siteConfig = {
 
   seo: {
     title: "CIFRA | Consultoria de INSS de Obra e Regularização",
-    titleTemplate: "%s | CIFRA , Consultoria Tributária de Obra",
+    titleTemplate: "%s | CIFRA",
     description:
       "Consultoria especializada em INSS de obra, CNO, SERO, aferição e regularização tributária. Solicite uma análise da sua obra com a CIFRA.",
     keywords: [

@@ -26,10 +26,8 @@ const routes: RouteConfig[] = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastMod = new Date().toISOString();
   return routes.map((route) => ({
-    url: `${siteConfig.url}${route.url}`,
-    lastModified: lastMod,
+    url: new URL(route.url || "/", siteConfig.url).href,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));

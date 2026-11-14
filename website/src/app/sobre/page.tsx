@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -12,11 +13,12 @@ import { PageHeader } from "@/components/layout/page-header";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/sobre/",
   title: "Sobre a CIFRA",
   description:
     "A CIFRA é uma consultoria especializada na análise e regularização do INSS incidente sobre obras da construção civil, com atendimento em todo o Brasil.",
-};
+});
 
 const pillars = [
   {

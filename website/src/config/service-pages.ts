@@ -15,6 +15,9 @@ export interface ServicePageContent {
   sections: { heading: string; paragraphs: string[] }[];
   checklist: { heading: string; items: string[] };
   ctaTitle: string;
+  steps?: { title: string; description: string }[];
+  faq?: { question: string; answer: string }[];
+  sources?: { label: string; href: string }[];
 }
 
 export const servicePages: ServicePageContent[] = [
@@ -132,18 +135,18 @@ export const servicePages: ServicePageContent[] = [
   {
     slug: "afericao-de-obra",
     name: "Aferição de obra",
-    metaTitle: "Aferição de Obra , Cálculo e Acompanhamento",
+    metaTitle: "Aferição de obra no SERO: etapas e documentos",
     metaDescription:
-      "Aferição direta e indireta de obras: entenda como o valor do INSS é calculado e como a CIFRA acompanha o processo para evitar cobranças indevidas.",
-    heroTitle: "Aferição de obra",
+      "Entenda como fazer a aferição de obra no SERO, quais documentos reunir e como conferir áreas e cálculos. Solicite a análise do INSS da sua construção.",
+    heroTitle: "Aferição de obra no SERO",
     heroDescription:
-      "A aferição é o momento em que o valor do INSS da obra é efetivamente apurado. Área, tipo, padrão, período e documentos disponíveis mudam o resultado , e cada detalhe conta.",
+      "A aferição apura as contribuições previdenciárias da construção. Entenda as etapas, organize os documentos e confira as informações da obra antes de concluir o procedimento na Receita Federal.",
     sections: [
       {
         heading: "Como funciona a aferição",
         paragraphs: [
-          "Quando a obra possui escrituração e documentação completas, a apuração pode se basear nos valores reais de mão de obra. Na ausência delas, aplica-se a aferição indireta: um cálculo estimado a partir da área construída, da destinação e do padrão da obra, conforme parâmetros definidos pela Receita Federal.",
-          "A legislação também prevê situações que influenciam o valor final, como o aproveitamento de recolhimentos e notas fiscais, o enquadramento correto da categoria da obra e a observância dos prazos legais aplicáveis a construções mais antigas. Ignorar esses pontos costuma resultar em valores maiores do que o necessário.",
+          "O Serviço Eletrônico para Aferição de Obras, o SERO, utiliza os dados da construção cadastrada no CNO para apurar as contribuições relacionadas à mão de obra. A regularização é uma etapa do processo para obter a certidão fiscal da obra.",
+          "Segundo a Receita Federal, obras de responsabilidade de pessoa física são regularizadas por aferição indireta. Para pessoas jurídicas, a forma de apuração depende, entre outros requisitos, da existência de contabilidade regular e formalizada. O enquadramento deve ser conferido antes do preenchimento.",
         ],
       },
       {
@@ -164,7 +167,49 @@ export const servicePages: ServicePageContent[] = [
         "Qualidade e consistência da documentação.",
       ],
     },
-    ctaTitle: "Solicite o acompanhamento da sua aferição",
+    ctaTitle: "Solicite a análise e o orçamento da aferição da sua obra",
+    steps: [
+      {
+        title: "Confira o cadastro e reúna os documentos",
+        description: "Verifique o CNO, o alvará, o habite-se ou documentos equivalentes e as informações de execução. Separe também os registros e recolhimentos de mão de obra existentes.",
+      },
+      {
+        title: "Revise as características e as áreas da obra",
+        description: "Confira destinação, tipo, datas e áreas informadas. Identifique se a regularização é da obra completa ou de uma parte e considere as regularizações anteriores.",
+      },
+      {
+        title: "Confira a memória de cálculo no SERO",
+        description: "Analise o enquadramento e os créditos admitidos nas regras antes da transmissão. Notas fiscais e outros documentos só podem ser considerados nas situações previstas para cada caso.",
+      },
+      {
+        title: "Acompanhe a declaração e a regularidade fiscal",
+        description: "A conclusão da aferição gera a DCTFWeb Aferição de Obras. Os próximos passos dependem do resultado, dos valores devidos e de eventuais pendências para a emissão da certidão.",
+      },
+    ],
+    faq: [
+      {
+        question: "A aferição usa a área construída ou a área total do terreno?",
+        answer: "A obra deve ser descrita pelas áreas do projeto e do cadastro no CNO, com o enquadramento de áreas principais e complementares. A metragem do terreno, sozinha, não representa a área da construção. Na regularização parcial, também é preciso identificar a parte que será aferida.",
+      },
+      {
+        question: "Uma obra de até 70 m² tem isenção automaticamente?",
+        answer: "A área isoladamente não define a dispensa. A Receita estabelece condições conjuntas relacionadas ao responsável, à finalidade e ao tipo da residência e à utilização de mão de obra remunerada. É necessário conferir os requisitos aplicáveis à construção antes de concluir que não há contribuição devida.",
+      },
+      {
+        question: "O que fazer se ampliei a construção depois da aferição?",
+        answer: "Reúna os documentos da ampliação e da regularização anterior. É preciso conferir o cadastro no CNO e a situação das aferições existentes para identificar o procedimento adequado. A Receita prevê retificação de aferições, mas a aplicação desse procedimento depende do caso.",
+      },
+      {
+        question: "Como solicitar um orçamento de aferição de obra?",
+        answer: "Informe a localização, a área construída, a fase e o período de execução da obra, além da existência de CNO ou cálculo anterior. Pelo formulário de análise, a CIFRA recebe os dados iniciais para avaliar o escopo do atendimento e orientar o orçamento e os próximos passos.",
+      },
+    ],
+    sources: [
+      { label: "Receita Federal: aferição de obras no SERO", href: "https://www.gov.br/receitafederal/pt-br/assuntos/construcao-civil/sero" },
+      { label: "Receita Federal: procedimentos para regularizar a obra", href: "https://www.gov.br/receitafederal/pt-br/assuntos/construcao-civil/sero/afericao/como-regularizar" },
+      { label: "Manual oficial do SERO, incluindo áreas e situações de dispensa", href: "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/manuais/manual-do-sero/manual-do-sero.pdf" },
+      { label: "Receita Federal: como corrigir uma aferição realizada", href: "https://www.gov.br/receitafederal/pt-br/assuntos/construcao-civil/sero/retificar" },
+    ],
   },
   {
     slug: "planejamento-tributario",

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
 import { siteConfig } from "@/config/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/politica-de-privacidade/",
   title: "Política de Privacidade",
   description:
     "Saiba como a CIFRA trata os dados pessoais informados no site, em conformidade com a LGPD.",
-};
+});
 
 export default function PoliticaDePrivacidadePage() {
   return (

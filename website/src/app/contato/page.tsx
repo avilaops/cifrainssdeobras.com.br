@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import { Globe, Mail, MessageCircle, Monitor } from "lucide-react";
 import { CONTACT_EMAIL } from "@/config/contact";
 import { siteConfig } from "@/config/site";
@@ -9,11 +10,12 @@ import { EmailLink } from "@/components/layout/email-link";
 import { LeadFormSection } from "@/components/sections/lead-form-section";
 import { Reveal } from "@/components/motion/reveal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/contato/",
   title: "Contato",
   description:
     "Fale com a CIFRA pelo WhatsApp ou envie o formulário de análise inicial da sua obra. Atendimento online em todo o Brasil.",
-};
+});
 
 export default function ContatoPage() {
   return (

@@ -100,6 +100,7 @@ export const viewport: Viewport = {
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": `${siteConfig.url}/#organizacao`,
   name: siteConfig.legalName,
   url: siteConfig.url,
   logo: `${siteConfig.url}/images/logo-cifra.jpg`,
