@@ -2,6 +2,12 @@ name: Build e deploy
 on:
   push:
     branches: [main]
+    # Conteúdo do website tem publicação própria em cloudflare-pages.yml.
+    # Mudanças deste workflow são validadas no PR ou por workflow_dispatch.
+    paths:
+      - 'calculadora/**'
+      - '.github/workflows/container.yml'
+      - '.github/workflows/deploy-ssh.yml'
   pull_request:
     branches: [main]
   workflow_dispatch:
