@@ -55,6 +55,7 @@ export function ServicePageView({ content }: ServicePageViewProps) {
       "@id": `${siteConfig.url}/#organizacao`,
       name: siteConfig.legalName,
       url: siteConfig.url,
+      image: `${siteConfig.url}/images/logo-cifra.jpg`,
     },
     areaServed: {
       "@type": "Country",
