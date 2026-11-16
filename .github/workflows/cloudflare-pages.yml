@@ -35,6 +35,7 @@ jobs:
           npm ci
           npm run typecheck
           npm run build
+          npm test
       - name: Check out text publisher
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:

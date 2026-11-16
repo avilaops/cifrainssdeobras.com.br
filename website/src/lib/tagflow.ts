@@ -33,6 +33,7 @@ interface TrackOptions {
 }
 
 const CONSENT_STORAGE_KEY = "cifra-cookie-consent-v2";
+let sessionConsent: ConsentStatus | undefined;
 const CAMPAIGN_STORAGE_KEY = "cifra-campaign";
 const SESSION_ID_KEY = "cifra-session-id";
 const ANONYMOUS_ID_KEY = "cifra-anonymous-id";
@@ -69,6 +70,7 @@ function getOrCreateStorageId(key: string, storage: Storage) {
 }
 
 function readConsent(): ConsentPreferences {
+  if (sessionConsent) return sessionConsent;
   try {
     const raw = localStorage.getItem(CONSENT_STORAGE_KEY);
     if (!raw) return { analytics: false, marketing: false };
@@ -84,6 +86,7 @@ function readConsent(): ConsentPreferences {
 
 export function getStoredConsent(): ConsentStatus | null {
   if (typeof window === "undefined") return null;
+  if (sessionConsent) return sessionConsent;
   try {
     const raw = localStorage.getItem(CONSENT_STORAGE_KEY);
     if (!raw) return null;
@@ -138,50 +141,6 @@ function sanitize(payload: TagflowPayload) {
   );
 }
 
-/**
- * Quais eventos daqui são a conversão do site, do ponto de vista do GA4.
- *
- * O site não fecha negócio na própria página: a solicitação termina no
- * WhatsApp. Estes quatro são os últimos sinais observáveis antes de a pessoa
- * sair, e viram um único `generate_lead` no GA4.
- *
- * `whatsapp_redirect` e `form_submit` ficam de fora de propósito: eles
- * acontecem no mesmo gesto que `click_whatsapp` e `lead`, e mapear os dois
- * contaria cada lead duas vezes no relatório.
- */
-const GA4_LEAD_SOURCE: Partial<Record<TagflowEventName, string>> = {
-  click_whatsapp: "whatsapp",
-  click_phone: "telefone",
-  click_email: "email",
-  lead: "formulario",
-};
-
-/**
- * Espelha a conversão no dataLayer, para a tag do container GTM-56HK6D2Q
- * traduzir em GA4 e em conversão de Ads.
- *
- * Vai só `lead_source` e `lead_subject`: o payload interno carrega tipo de
- * cliente e situação da obra, que servem ao CRM e não têm por que atravessar
- * para o Google.
- */
-function pushGa4Lead(event: TagflowEventName, payload: TagflowPayload) {
-  const leadSource = GA4_LEAD_SOURCE[event];
-  if (!leadSource) return;
-
-  const subject = payload.placement ?? payload.source ?? payload.formId;
-
-  const target = window as Window & {
-    dataLayer?: Array<Record<string, unknown>>;
-  };
-  target.dataLayer = target.dataLayer || [];
-  target.dataLayer.push({
-    event: "generate_lead",
-    lead_source: leadSource,
-    ...(subject ? { lead_subject: String(subject) } : {}),
-    page_path: window.location.pathname,
-  });
-}
-
 export function trackTagflowEvent(
   event: TagflowEventName,
   payload: TagflowPayload = {},
@@ -192,10 +151,6 @@ export function trackTagflowEvent(
 
   const consent = readConsent();
   if (!consent.analytics && !consent.marketing) return null;
-
-  // Antes do early-return abaixo: o GTM é independente do endpoint interno, e
-  // com o Tagflow próprio desligado o GA4 continuaria tendo que medir o lead.
-  pushGa4Lead(event, payload);
 
   if (!IS_TAGFLOW_CONFIGURED) return null;
 
@@ -266,16 +221,15 @@ export function trackEvent(
 
 export function storeConsent(status: ConsentStatus) {
   if (typeof window === "undefined") return;
+  let next = { analytics: status.analytics === true, marketing: status.marketing === true };
   try {
-    localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(status));
-    window.dispatchEvent(
-      new CustomEvent(CONSENT_CHANGE_EVENT, { detail: status }),
-    );
-    trackTagflowEvent("cookie_consent_update", {
-      analytics: status.analytics,
-      marketing: status.marketing,
-    });
+    localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(next));
   } catch {
-    // Sem persistência, nenhum rastreamento opcional é habilitado.
+    next = { analytics: false, marketing: false };
+    try { localStorage.removeItem(CONSENT_STORAGE_KEY); } catch { /* Session denial still applies. */ }
   }
+  sessionConsent = next;
+  (window as Window & { __cifraConsent?: ConsentStatus }).__cifraConsent = next;
+  window.dispatchEvent(new CustomEvent(CONSENT_CHANGE_EVENT, { detail: next }));
+  trackTagflowEvent("cookie_consent_update", next);
 }
