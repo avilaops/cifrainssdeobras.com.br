@@ -6,6 +6,7 @@ import { Logo } from "@/components/layout/logo";
 import { WhatsAppLink } from "@/components/layout/whatsapp-link";
 import { EmailLink } from "@/components/layout/email-link";
 import { SocialLink } from "@/components/layout/social-link";
+import { CookiePreferences } from "@/components/layout/cookie-consent";
 
 const footerServices = [
   { label: "INSS de obra", href: "/servicos/inss-de-obra/" },
@@ -151,6 +152,7 @@ export function Footer() {
               © {year} {siteConfig.legalName}. Todos os direitos reservados.
             </p>
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              <li><CookiePreferences /></li>
               <li>
                 <Link
                   href="/politica-de-privacidade/"
