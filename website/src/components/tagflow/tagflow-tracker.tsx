@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
+import { createConsentPageViewGate } from "@/lib/consent-pageviews";
 import {
   CONSENT_CHANGE_EVENT,
   getStoredConsent,
@@ -12,6 +13,7 @@ import {
 export function TagflowTracker() {
   const pathname = usePathname();
   const [consentVersion, setConsentVersion] = React.useState(0);
+  const visit = React.useRef(createConsentPageViewGate());
 
   React.useEffect(() => {
     const sync = () => setConsentVersion((value) => value + 1);
@@ -21,7 +23,7 @@ export function TagflowTracker() {
 
   React.useEffect(() => {
     const consent = getStoredConsent();
-    if (!consent?.analytics) return;
+    if (!visit.current(pathname, consent?.analytics === true)) return;
     trackEvent("page_view");
   }, [pathname, consentVersion]);
 
